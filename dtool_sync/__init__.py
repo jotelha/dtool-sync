@@ -12,7 +12,10 @@ except PackageNotFoundError:
    pass
 
 
+import click
 import difflib
+import json
+
 import dtoolcore
 
 
@@ -156,7 +159,7 @@ def _get_info(storage_broker):
 @click.command()
 @click.argument("lhs_base_uri")
 @click.argument("rhs_base_uri")
-def udiff(lhs_base_uri, rhs_base_uri):
+def diff(lhs_base_uri, rhs_base_uri):
     """Print UUID diff list between left hand side base URI and right hand side base URI."""
     lhs_info = _direct_list(lhs_base_uri)
     rhs_info = _direct_list(rhs_base_uri)
@@ -170,5 +173,8 @@ def udiff(lhs_base_uri, rhs_base_uri):
 
     for line in diff:
         click.secho(line)
+
+    click.secho("DONE")
+
 
 

@@ -24,10 +24,12 @@ setup(
     url=url,
     setup_requires=['setuptools_scm'],
     install_requires=[
+        "click",
+        "dtoolcore",
         "dtool-cli",
     ],
     entry_points={
-        'dtool.cli': ['sync=dtool_sync:sync'],
+        'dtool.cli': ['diff=dtool_sync:diff'],
     },
     download_url="{}/tarball/{}".format(url, version),
     license="MIT"

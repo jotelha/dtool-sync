@@ -12,12 +12,12 @@ except PackageNotFoundError:
    pass
 
 
-import click
-import difflib
-import json
+import logging
+import json as JSON
 
 import dtoolcore
 
+from dtool_info.utils import sizeof_fmt, date_fmt
 
 from dtool_cli.cli import (
     CONFIG_PATH,
@@ -110,29 +110,8 @@ def _direct_list(base_uri, config_path=CONFIG_PATH):
 
     for uri in storage_broker.list_dataset_uris(base_uri, config_path):
         admin_metadata = dtoolcore._admin_metadata_from_uri(uri, config_path)
-        info.append(admin_metadata)
 
-    by_name = sorted(info, key=lambda d: d['name'])
-    return by_name
-
-
-def _format_nested(l):
-    """Print a nested structure, i.e list or dict."""
-    return json.dumps(l, indent=4)
-
-
-def _format_dataset_list(l, verbose=True):
-    """Print a list of dataset metadata entries."""
-    if not verbose:
-        l = [e[0]['uuid'] if isinstance(e, tuple) else e['uuid'] for e in l]
-    return _format_nested(l)
-
-
-def _get_info(storage_broker):
-    info = []
-
-    for uri in storage_broker.list_dataset_uris(base_uri, CONFIG_PATH):
-        admin_metadata = dtoolcore._admin_metadata_from_uri(uri, CONFIG_PATH)
+        fg = "green"
         name = admin_metadata["name"]
         if admin_metadata["type"] == "protodataset":
             fg = "red"
@@ -146,35 +125,54 @@ def _get_info(storage_broker):
         if "frozen_at" in admin_metadata:
             i["date"] = date_fmt(admin_metadata["frozen_at"])
         info.append(i)
+        # info.append(admin_metadata)
 
-    return info
-
-
-# def _list_datasets(base_uri):
-#    base_uri = dtoolcore.utils.sanitise_uri(base_uri)
-#    storage_broker = dtoolcore._get_storage_broker(base_uri, CONFIG_PATH)
-#    return _get_info(storage_broker)
+    by_uuid = sorted(info, key=lambda d: d['uuid'])
+    return by_uuid
 
 
-@click.command()
-@click.argument("lhs_base_uri")
-@click.argument("rhs_base_uri")
-def diff(lhs_base_uri, rhs_base_uri):
-    """Print UUID diff list between left hand side base URI and right hand side base URI."""
-    lhs_info = _direct_list(lhs_base_uri)
-    rhs_info = _direct_list(rhs_base_uri)
-
-    lhs_str = _format_dataset_list(lhs_info)
-    rhs_str = _format_dataset_list(rhs_info)
-
-    diff = difflib.ndiff(
-        lhs_str.splitlines(keepends=True),
-        rhs_str.splitlines(keepends=True))
-
-    for line in diff:
-        click.secho(line)
-
-    click.secho("DONE")
-
-
-
+def _format_dataset_list(l, quiet=False, verbose=False, json=False, ls_output=False):
+    """Print a list of dataset metadata entries."""
+    if json:  # print as indented json
+        if quiet:
+            l = [e[0]['uuid'] if isinstance(e, tuple) else e['uuid'] for e in l]
+        elif verbose:
+            pass
+        else:
+            d = [{
+                    "name": e['name'],
+                    "uuid": e['uuid'],
+                    "creator": e['creator'],
+                } for e in l]
+            for el, ed in zip(l, d):
+                if "date" in el:
+                    ed["date"] = el["date"]
+            l = d
+        s = JSON.dumps(l, indent=4)
+    elif ls_output:  # diff on output as formatted by 'dtool ls', not very meaningful
+        s = ''
+        for i in l:
+            if quiet:
+                s += i["uri"] + '\n'
+                continue
+            s += i["name"] + '\n'
+            s += "  " + i["uri"] + '\n'
+            if verbose:
+                s += "  " + i["creator"]
+                if "date" in i:
+                    s += "  " + i["date"]
+                s += "  " + i["uuid"] + '\n'
+    else:  # diff on ls-like output, but emphasizing uuids, excluding uris
+        s = ''
+        for i in l:
+            if quiet:
+                s += i["uuid"] + '\n'
+                continue
+            s += i["name"] + '\n'
+            s += "  " + i["uuid"] + '\n'
+            if verbose:
+                s += "  " + i["creator"]
+                if "date" in i:
+                    s += "  " + i["date"]
+                s += '\n'
+    return s

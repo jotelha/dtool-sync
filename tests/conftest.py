@@ -57,9 +57,13 @@ def lhs_repository_fixture(lhs_uri_fixture):
     for file in os.listdir(SAMPLE_DATASETS_DIR):
         src = os.path.join(SAMPLE_DATASETS_DIR, file)
         if os.path.isdir(src):
+            if file == 'he':
+                continue
             src = dir_to_uri(src)
             dest = lhs_uri_fixture
             dtoolcore.copy(src, dest)
+
+    return  lhs_uri_fixture
 
 
 @pytest.fixture
@@ -67,6 +71,20 @@ def rhs_repository_fixture(rhs_uri_fixture):
     for file in os.listdir(SAMPLE_DATASETS_DIR):
         src = os.path.join(SAMPLE_DATASETS_DIR, file)
         if os.path.isdir(src):
+            if file == 'people':
+                continue
             src = dir_to_uri(src)
             dest = rhs_uri_fixture
             dtoolcore.copy(src, dest)
+
+    return  rhs_uri_fixture
+
+
+@pytest.fixture
+def lhs_rhs_diff_q_output(request):
+    return """@@ -1,4 +1,4 @@
+ 0b5f7c56-5f7e-43de-9b16-bd6f7ac7da12
++33a30c8d-60c2-44ac-8ade-abe99a7e2f92
+ 5cb6d8bb-255b-4ca5-a445-c1f8121c5333
+-9d14c3e3-2c87-4bff-9e17-3c51f5f535a0
+ cc6519a9-7862-4b47-91d2-105d4ae64512"""

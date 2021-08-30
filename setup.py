@@ -29,7 +29,7 @@ setup(
         "dtool-cli",
     ],
     entry_points={
-        'dtool.cli': ['diff=dtool_sync:diff'],
+        'dtool.cli': ['sync=dtool_sync.cli:sync'],
     },
     download_url="{}/tarball/{}".format(url, version),
     license="MIT"

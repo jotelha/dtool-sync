@@ -1,0 +1,11 @@
+*.pyc
+*.swp
+*.egg-info
+
+.coverage
+.eggs
+.cache
+.tox
+
+env
+dist

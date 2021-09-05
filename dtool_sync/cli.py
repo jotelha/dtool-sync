@@ -2,15 +2,20 @@
 
 import click
 import difflib
+import json as JSON
 
-from . import _direct_list, _format_dataset_list
+from . import _direct_list, _format_dataset_enumerable
 from .compare import compare_dataset_lists
 
 @click.group()
 def sync():
-    """synchronization utilities."""
+    """repository synchronization utilities."""
 
-@sync.command()
+@click.group()
+def compare():
+    """repository comparison utilities."""
+
+@compare.command()
 @click.option("-q", "--quiet", is_flag=True)
 @click.option("-v", "--verbose", is_flag=True)
 @click.option("-j", "--json", is_flag=True)
@@ -21,8 +26,8 @@ def diff(quiet, verbose, json, lhs_base_uri, rhs_base_uri):
     lhs_info = _direct_list(lhs_base_uri, raw=False)
     rhs_info = _direct_list(rhs_base_uri, raw=False)
 
-    lhs_str = _format_dataset_list(lhs_info, quiet=quiet, verbose=verbose, json=json)
-    rhs_str = _format_dataset_list(rhs_info, quiet=quiet, verbose=verbose, json=json)
+    lhs_str = _format_dataset_enumerable(lhs_info, quiet=quiet, verbose=verbose, json=json)
+    rhs_str = _format_dataset_enumerable(rhs_info, quiet=quiet, verbose=verbose, json=json)
 
     diff = difflib.unified_diff(
         lhs_str.splitlines(keepends=True),
@@ -44,108 +49,91 @@ def diff(quiet, verbose, json, lhs_base_uri, rhs_base_uri):
         click.secho(line, nl=False, fg=c, bold=bold)
     click.secho('')
 
-@sync.command()
-@click.option("-t", "--terse", is_flag=True)
-@click.option("-v", "--verbose", is_flag=True)
-@click.option("-j", "--json", is_flag=True)
-@click.option("-r", "--raw", is_flag=True)
+
+@compare.command(name="all")
+@click.option("-j", "--json", is_flag=True, help="Print metadata of compared datasets as JSON")
+@click.option("-q", "--quiet", is_flag=True, help="Print less.")
+@click.option("-r", "--raw", is_flag=True, help="Compare and print raw metadata instead of reformatted values in the style of 'dtool ls' output.")
+@click.option("-u", "--uuid", is_flag=True, help="Print UUIDs instead of names.")
+@click.option("-v", "--verbose", is_flag=True, default=False, help="Print more metadata.")
 @click.argument("source_base_uri")
 @click.argument("target_base_uri")
-def compare(source_base_uri, target_base_uri,
-            marker={'uuid': True, 'name': True, 'frozen_at': True}, # key 'created_at' apparently introduced in later dtool versions
-            verbose=True, terse=False, json=True, raw=False,
-            print_equal=True,
-            print_differing=True,
-            print_missing=True):
-    """Print diff report between left hand side base URI and right hand side."""
+def compare_all(source_base_uri, target_base_uri,
+            json, quiet, raw, uuid, verbose,
+            marker={'uuid': True, 'name': True, 'frozen_at': True}):  # key 'created_at' apparently introduced in later dtool versions:
+    """Print diff report between source and target base URIs."""
     source_info = _direct_list(source_base_uri, raw=raw)
     target_info = _direct_list(target_base_uri, raw=raw)
 
-    equal, differing, missing = compare_dataset_lists(source_info, target_info, marker)
-
-    if len(equal) > 0 and print_equal:
-        if not terse:
-            print("")
-            print("Datasets equal on source and target:")
-            print("")
-        click.secho(
-            _format_dataset_list(equal, quiet=terse, verbose=verbose, json=json, ls_output=True))
-
-    if len(differing) > 0 and print_differing:
-        if not terse:
-            print("")
-            print("Datasets differing between source and target:")
-            print("")
-        click.secho(
-            _format_dataset_list(differing, quiet=terse, verbose=verbose, json=json, ls_output=True))
-
-    if len(missing) > 0 and print_missing:
-        if not terse:
-            print("")
-            print("Datasets misssing on target:")
-            print("")
-        click.secho(
-            _format_dataset_list(missing, quiet=terse, verbose=verbose, json=json, ls_output=True))
+    equal, changed, missing = compare_dataset_lists(source_info, target_info, marker)
+    out_dict = {
+        "equal": equal,
+        "changed": changed,
+        "missing": missing,
+    }
+    click.echo(
+        _format_dataset_enumerable(out_dict, quiet=quiet, verbose=verbose, json=json, ls_output=not uuid)
+    )
 
 
-@sync.command()
-@click.option("-t", "--terse", is_flag=True)
-@click.option("-v", "--verbose", is_flag=True)
-@click.option("-j", "--json", is_flag=True)
-@click.option("-r", "--raw", is_flag=True)
+@compare.command(name="equal")
+@click.option("-j", "--json", is_flag=True, help="Print metadata of compared datasets as JSON")
+@click.option("-q", "--quiet", is_flag=True, help="Print less.")
+@click.option("-r", "--raw", is_flag=True, help="Compare and print raw metadata instead of reformatted values in the style of 'dtool ls' output.")
+@click.option("-u", "--uuid", is_flag=True, help="Print UUIDs instead of names.")
+@click.option("-v", "--verbose", is_flag=True, help="Print more metadata.")
 @click.argument("source_base_uri")
 @click.argument("target_base_uri")
-def missing(source_base_uri, target_base_uri,
-            marker={'uuid': True, 'name': True, 'frozen_at': True}, # key 'created_at' apparently introduced in later dtool versions
-            verbose=True, terse=False, json=True, raw=False):
-    """Report datasets present at source but missing at target."""
-    source_info = _direct_list(source_base_uri, raw=raw)
-    target_info = _direct_list(target_base_uri, raw=raw)
-
-    _, _, missing = compare_dataset_lists(source_info, target_info, marker)
-
-    if len(missing) > 0:
-        click.secho(
-            _format_dataset_list(missing, quiet=terse, verbose=verbose, json=json))
-
-
-@sync.command()
-@click.option("-t", "--terse", is_flag=True)
-@click.option("-v", "--verbose", is_flag=True)
-@click.option("-j", "--json", is_flag=True)
-@click.option("-r", "--raw", is_flag=True)
-@click.argument("source_base_uri")
-@click.argument("target_base_uri")
-def equal(source_base_uri, target_base_uri,
-            marker={'uuid': True, 'name': True, 'frozen_at': True}, # key 'created_at' apparently introduced in later dtool versions
-            verbose=True, terse=False, json=True, raw=False):
+def compare_equal(source_base_uri, target_base_uri,
+            json, quiet, raw, uuid, verbose,
+            marker={'uuid': True, 'name': True, 'frozen_at': True}):  # key 'created_at' apparently introduced in later dtool versions:
     """Report datasets that equal each other at source and at target."""
     source_info = _direct_list(source_base_uri, raw=raw)
     target_info = _direct_list(target_base_uri, raw=raw)
 
     equal, _, _ = compare_dataset_lists(source_info, target_info, marker)
+    click.echo(
+        _format_dataset_enumerable(equal, quiet=quiet, verbose=verbose, json=json, ls_output=not uuid)
+    )
 
-    if len(equal) > 0:
-        click.secho(
-            _format_dataset_list(equal, quiet=terse, verbose=verbose, json=json))
 
-
-@sync.command()
-@click.option("-t", "--terse", is_flag=True)
-@click.option("-v", "--verbose", is_flag=True)
-@click.option("-j", "--json", is_flag=True)
-@click.option("-r", "--raw", is_flag=True)
+@compare.command(name="changed")
+@click.option("-j", "--json", is_flag=True, help="Print metadata of compared datasets as JSON")
+@click.option("-q", "--quiet", is_flag=True, help="Print less.")
+@click.option("-r", "--raw", is_flag=True, help="Compare and print raw metadata instead of reformatted values in the style of 'dtool ls' output.")
+@click.option("-u", "--uuid", is_flag=True, help="Print UUIDs instead of names.")
+@click.option("-v", "--verbose", is_flag=True, default=False, help="Print more metadata.")
 @click.argument("source_base_uri")
 @click.argument("target_base_uri")
-def differing(source_base_uri, target_base_uri,
-            marker={'uuid': True, 'name': True, 'frozen_at': True}, # key 'created_at' apparently introduced in later dtool versions
-            verbose=True, terse=False, json=True, raw=False):
-    """Report datasets present but differing at source and target."""
+def compare_missing(source_base_uri, target_base_uri,
+            json, quiet, raw, uuid, verbose,
+            marker={'uuid': True, 'name': True, 'frozen_at': True}):  # key 'created_at' apparently introduced in later dtool versions:
+    """Report datasets present at source but missing at target."""
     source_info = _direct_list(source_base_uri, raw=raw)
     target_info = _direct_list(target_base_uri, raw=raw)
 
-    _, differing, _ = compare_dataset_lists(source_info, target_info, marker)
+    _, changed, _ = compare_dataset_lists(source_info, target_info, marker)
+    click.echo(
+        _format_dataset_enumerable(changed, quiet=quiet, verbose=verbose, json=json, ls_output=not uuid)
+    )
 
-    if len(differing) > 0:
-        click.secho(
-            _format_dataset_list(differing, quiet=terse, verbose=verbose, json=json))
+
+@compare.command(name="missing")
+@click.option("-j", "--json", is_flag=True, help="Print metadata of compared datasets as JSON")
+@click.option("-q", "--quiet", is_flag=True, help="Print less.")
+@click.option("-r", "--raw", is_flag=True, help="Compare and print raw metadata instead of reformatted values in the style of 'dtool ls' output.")
+@click.option("-u", "--uuid", is_flag=True, help="Print UUIDs instead of names.")
+@click.option("-v", "--verbose", is_flag=True, default=False, help="Print more metadata.")
+@click.argument("source_base_uri")
+@click.argument("target_base_uri")
+def compare_missing(source_base_uri, target_base_uri,
+            json, quiet, raw, uuid, verbose,
+            marker={'uuid': True, 'name': True, 'frozen_at': True}):  # key 'created_at' apparently introduced in later dtool versions:
+    """Report datasets present at source but missing at target."""
+    source_info = _direct_list(source_base_uri, raw=raw)
+    target_info = _direct_list(target_base_uri, raw=raw)
+
+    _, _, missing = compare_dataset_lists(source_info, target_info, marker)
+    click.echo(
+        _format_dataset_enumerable(missing, quiet=quiet, verbose=verbose, json=json, ls_output=not uuid)
+    )

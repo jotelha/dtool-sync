@@ -30,6 +30,7 @@ setup(
     ],
     entry_points={
         'dtool.cli': ['sync=dtool_sync.cli:sync'],
+        'dtool.cli': ['compare=dtool_sync.cli:compare'],
     },
     download_url="{}/tarball/{}".format(url, version),
     license="MIT"

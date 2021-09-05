@@ -14,6 +14,7 @@ except PackageNotFoundError:
 
 import json as JSON
 
+import click
 import dtoolcore
 
 from dtool_info.utils import sizeof_fmt, date_fmt
@@ -66,53 +67,99 @@ def _direct_list(base_uri, config_path=CONFIG_PATH, raw=True):
 def _field_exists(e, field):
     return field in e[0] if isinstance(e, tuple) else field in e
 
-
 def _extract_field(e, field):
     return e[0][field] if isinstance(e, tuple) else e[field]
 
 
-def _format_dataset_list(l, quiet=False, verbose=False, json=False, ls_output=False):
+def _json_format_dataset_list(dataset_list, quiet=False, verbose=False):
+    """Formats list of dataset for pretty JSON output, returns list with modified entries."""
+    if quiet:
+        dataset_list = [_extract_field(element, 'uuid') for element in dataset_list]
+    elif verbose:
+        pass
+    else:
+        d = [{
+            "name": _extract_field(element, 'name'),
+            "uuid": _extract_field(element, 'uuid'),
+            "creator_username": _extract_field(element, 'creator_username'),
+        } for element in dataset_list]
+        for el, ed in zip(dataset_list, d):
+            if _field_exists(el, "frozen_at"):
+                ed["frozen_at"] = str(_extract_field(el, 'frozen_at'))
+        dataset_list = d
+    return dataset_list
+
+
+def _json_format_dataset_enumerable(dataset_enumerable, quiet=False, verbose=False):
+    if isinstance(dataset_enumerable, dict):
+        out_enumerable = {key: _json_format_dataset_list(value, quiet=quiet, verbose=verbose) for key, value in dataset_enumerable.items()}
+    else:
+        out_enumerable = _json_format_dataset_list(dataset_enumerable, quiet=quiet, verbose=verbose)
+    return out_enumerable
+
+
+def _txt_format_dataset_list(dataset_list, quiet=False, verbose=False, ls_output=False):
     """Format a list of dataset metadata entries as text."""
-    if json:  # print as indented json
-        if quiet:
-            l = [_extract_field(e, 'uuid') for e in l]
-        elif verbose:
-            pass
-        else:
-            d = [{
-                    "name": _extract_field(e, 'name'),
-                    "uuid": _extract_field(e, 'uuid'),
-                    "creator_username": _extract_field(e, 'creator_username'),
-                } for e in l]
-            for el, ed in zip(l, d):
-                if _field_exists(el, "frozen_at"):
-                    ed["frozen_at"] = str(_extract_field(el, 'frozen_at'))
-            l = d
-        s = JSON.dumps(l, indent=4)
-    elif ls_output:  # output as formatted by 'dtool ls', not very meaningful for diffs
-        s = ''
-        for i in l:
+    out_string = ''
+    if ls_output:  # output as formatted by 'dtool ls', not very meaningful for diffs
+        for i in dataset_list:
             if quiet:
-                s += _extract_field(i, "uri") + '\n'
+                out_string += _extract_field(i, "uri") + '\n'
                 continue
-            s += _extract_field(i, "name") + '\n'
-            s += "  " + _extract_field(i, "uri") + '\n'
+            out_string += _extract_field(i, "name") + '\n'
+            out_string += "  " + _extract_field(i, "uri") + '\n'
             if verbose:
-                s += "  " + _extract_field(i, "creator_username")
+                out_string += "  " + _extract_field(i, "creator_username")
                 if _field_exists(i, "frozen_at"):
-                    s += "  " + str(_extract_field(i, "frozen_at"))
-                s += "  " + _extract_field(i, 'uuid') + '\n'
+                    out_string += "  " + str(_extract_field(i, "frozen_at"))
+                out_string += "  " + _extract_field(i, 'uuid') + '\n'
     else:  # ls-like output, but emphasizing uuids, excluding uris
-        s = ''
-        for i in l:
+        for i in dataset_list:
             if quiet:
-                s += _extract_field(i, 'uuid') + '\n'
+                out_string += _extract_field(i, 'uuid') + '\n'
                 continue
-            s += _extract_field(i, "name") + '\n'
-            s += "  " + _extract_field(i, "uuid") + '\n'
+            out_string += _extract_field(i, "uuid") + '\n'
+            out_string += "  " + _extract_field(i, "uri") + '\n'
             if verbose:
-                s += "  " + _extract_field(i, "creator_username")
+                out_string += "  " + _extract_field(i, "creator_username")
                 if _field_exists(i, "frozen_at"):
-                    s += "  " + str(_extract_field(i, 'frozen_at'))
-                s += '\n'
-    return s
+                    out_string += "  " + str(_extract_field(i, 'frozen_at'))
+                out_string += "  " + _extract_field(i, "name") + '\n'
+    return out_string.rstrip()
+
+
+def _txt_format_dataset_enumerable(dataset_enumerable, quiet=False, verbose=False, ls_output=True):
+    key_label_pairs = {
+        "equal": "Datasets equal on source and target:",
+        "changed": "Datasets changed from source to target:",
+        "missing": "Datasets missing on target:",
+    }
+    key_color_pairs = {
+        "equal": "green",
+        "changed": "yellow",
+        "missing": "red"
+    }
+    if isinstance(dataset_enumerable, dict):
+        out_string = ''
+        for key, value in dataset_enumerable.items():
+            if key not in key_label_pairs:
+                raise ValueError(f"{key} not allowed.")
+            if not quiet:
+                out_string += click.style(key_label_pairs[key], bold=True) + '\n'
+            out_string += click.style(
+                _txt_format_dataset_list(value, quiet=quiet, verbose=verbose, ls_output=ls_output),
+                fg=key_color_pairs[key]) + '\n'
+    else:
+        out_string = _txt_format_dataset_list(dataset_enumerable, quiet=quiet, verbose=verbose, ls_output=ls_output)
+
+    return out_string.rstrip()
+
+
+
+def _format_dataset_enumerable(dataset_enumerable, quiet=False, verbose=False, json=False, ls_output=False):
+    if json:
+        return JSON.dumps(
+            _json_format_dataset_enumerable(dataset_enumerable, quiet=quiet, verbose=verbose),
+            indent=4)
+    else:
+        return _txt_format_dataset_enumerable(dataset_enumerable, quiet=quiet, verbose=verbose, ls_output=ls_output)

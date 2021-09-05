@@ -1,0 +1,12 @@
+{
+  "dtoolcore_version": "3.18.0",
+  "hash_function": "md5sum_hexdigest",
+  "items": {
+    "5436437fa01a7d3e41d46741da54b451446774ca": {
+      "hash": "f75b8179e4bbe7e2b4a074dcef62de95",
+      "relpath": "file.txt",
+      "size_in_bytes": 8,
+      "utc_timestamp": 1630862798.043878
+    }
+  }
+}

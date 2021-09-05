@@ -22,6 +22,7 @@ sys.path.insert(0, _ROOT)
 _DATA = os.path.join(_HERE, "data")
 
 SAMPLE_DATASETS_DIR = os.path.join(_DATA, "datasets")
+EXPECTED_OUTPUT_DIR = os.path.join(_DATA, "expected_output")
 
 
 def dir_to_uri(d):
@@ -81,11 +82,39 @@ def rhs_repository_fixture(rhs_uri_fixture):
 
 
 @pytest.fixture
-def lhs_rhs_diff_q_output(request):
-    return """@@ -1,4 +1,4 @@
- 065d9fe0-9e41-4add-8a55-577dbcfe2149
--534792bd-d102-4efc-bc11-6af743959704
-+7cc9d271-54c8-4685-99bf-70d872da0cc6
- 9ee101a4-7d1a-45c0-8955-da779398a5ed
- c2249963-6459-4901-8263-85610a7a2ac9
-"""
+def comparable_repositories_fixture(request):
+    lhs_uri = os.path.join(_DATA, "comparable", "lhs")
+    rhs_uri = os.path.join(_DATA, "comparable", "rhs")
+    return lhs_uri, rhs_uri
+
+
+# expected outputs
+@pytest.fixture
+def expected_output_diff_q(request):
+    with open(os.path.join(EXPECTED_OUTPUT_DIR, 'test_dtool_compare_diff_q.out'), 'r') as f:
+        return f.read()
+
+
+@pytest.fixture
+def expected_output_compare_all(request):
+    with open(os.path.join(EXPECTED_OUTPUT_DIR,'test_dtool_compare_all.out'), 'r') as f:
+        return f.read()
+
+
+@pytest.fixture
+def expected_output_compare_all_j(request):
+    with open(os.path.join(EXPECTED_OUTPUT_DIR,'test_dtool_compare_all_j.out'), 'r') as f:
+        return f.read()
+
+
+@pytest.fixture
+def expected_output_compare_all_qj(request):
+    with open(os.path.join(EXPECTED_OUTPUT_DIR,'test_dtool_compare_all_qj.out'), 'r') as f:
+        return f.read()
+
+
+@pytest.fixture
+def expected_output_compare_all_qu(request):
+    with open(os.path.join(EXPECTED_OUTPUT_DIR,'test_dtool_compare_all_qu.out'), 'r') as f:
+        return f.read()
+

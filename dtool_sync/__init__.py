@@ -155,7 +155,6 @@ def _txt_format_dataset_enumerable(dataset_enumerable, quiet=False, verbose=Fals
     return out_string.rstrip()
 
 
-
 def _format_dataset_enumerable(dataset_enumerable, quiet=False, verbose=False, json=False, ls_output=False):
     if json:
         return JSON.dumps(

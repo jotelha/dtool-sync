@@ -2,18 +2,24 @@
 
 import click
 import difflib
-import json as JSON
+
+from dtool_create.dataset import _copy as copy_dataset
 
 from . import _direct_list, _format_dataset_enumerable
 from .compare import compare_dataset_lists
+
 
 @click.group()
 def sync():
     """repository synchronization utilities."""
 
+
 @click.group()
 def compare():
     """repository comparison utilities."""
+
+
+# textual compare
 
 @compare.command()
 @click.option("-q", "--quiet", is_flag=True)
@@ -49,6 +55,8 @@ def diff(quiet, verbose, json, lhs_base_uri, rhs_base_uri):
         click.secho(line, nl=False, fg=c, bold=bold)
     click.secho('')
 
+
+# true compare
 
 @compare.command(name="all")
 @click.option("-j", "--json", is_flag=True, help="Print metadata of compared datasets as JSON")
@@ -137,3 +145,56 @@ def compare_missing(source_base_uri, target_base_uri,
     click.echo(
         _format_dataset_enumerable(missing, quiet=quiet, verbose=verbose, json=json, ls_output=not uuid)
     )
+
+
+# sync
+
+@sync.command(name="all")
+@click.option("-n", "--dry-run", is_flag=True, help="Only print datasets that will be transferred.")
+@click.option("-q", "--quiet", is_flag=True, help="Print less.")
+@click.option("-u", "--uuid", is_flag=True, help="Print UUIDs instead of names.")
+@click.option("-v", "--verbose", is_flag=True, default=False, help="Print more.")
+@click.option("--ignore-errors", is_flag=True, help="In case of an error, continue with copying next dataset instead of stopping with an error.")
+@click.argument("source_base_uri")
+@click.argument("target_base_uri")
+def sync_all(source_base_uri, target_base_uri,
+            dry_run, ignore_errors, quiet, uuid, verbose,
+            marker={'uuid': True, 'name': True, 'frozen_at': True}):  # key 'created_at' apparently introduced in later dtool versions:
+    """Sync datasets from source to target base URIs."""
+    source_info = _direct_list(source_base_uri, raw=True)
+    target_info = _direct_list(target_base_uri, raw=True)
+
+    equal, changed, missing = compare_dataset_lists(source_info, target_info, marker)
+    out_dict = {
+        "equal": equal,
+        "changed": changed,
+        "missing": missing,
+    }
+
+    if not quiet:
+        click.echo(
+            _format_dataset_enumerable(out_dict, quiet=quiet, verbose=verbose, json=False, ls_output=not uuid)
+        )
+
+        click.secho("Resume copying of changed datasets, presuming their transfer had been interrupted in an earlier attempt.")
+
+    for src_ds, dst_ds in changed:
+        try:
+            copy_dataset(resume=True, quiet=quiet, dataset_uri=src_ds["uri"], dest_base_uri=target_base_uri)
+        except click.UsageError as e:
+            if not ignore_errors:
+                raise
+            else:
+                pass
+
+    if not quiet:
+        click.secho("Copy missing datasets.")
+
+    for src_ds in missing:
+        try:
+            copy_dataset(resume=False, quiet=quiet, dataset_uri=src_ds["uri"], dest_base_uri=target_base_uri)
+        except click.UsageError as e:
+            if not ignore_errors:
+                raise
+            else:
+                pass

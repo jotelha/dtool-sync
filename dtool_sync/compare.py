@@ -23,10 +23,10 @@ def _compare(source, target, marker):
     if isinstance(marker, dict):
         for k, v in marker.items():
             if k not in source:
-                logger.error("{} not in source '{}'.".format(k, source))
+                logger.info("{} not in source '{}'.".format(k, source))
                 return False
             if k not in target:
-                logger.error("{} not in target '{}'.".format(k, source))
+                logger.info("{} not in target '{}'.".format(k, source))
                 return False
 
             logger.debug("Descending into sub-tree '{}' of '{}'.".format(

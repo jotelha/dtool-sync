@@ -119,6 +119,12 @@ def expected_output_compare_all_qj(request):
 
 
 @pytest.fixture
+def expected_output_compare_all_jr(request):
+    with open(os.path.join(EXPECTED_OUTPUT_DIR,'test_dtool_compare_all_jr.out'), 'r') as f:
+        return f.read()
+
+
+@pytest.fixture
 def expected_output_compare_all_qu(request):
     with open(os.path.join(EXPECTED_OUTPUT_DIR,'test_dtool_compare_all_qu.out'), 'r') as f:
         return f.read()

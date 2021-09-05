@@ -83,8 +83,9 @@ def rhs_repository_fixture(rhs_uri_fixture):
 @pytest.fixture
 def lhs_rhs_diff_q_output(request):
     return """@@ -1,4 +1,4 @@
- 0b5f7c56-5f7e-43de-9b16-bd6f7ac7da12
-+33a30c8d-60c2-44ac-8ade-abe99a7e2f92
- 5cb6d8bb-255b-4ca5-a445-c1f8121c5333
--9d14c3e3-2c87-4bff-9e17-3c51f5f535a0
- cc6519a9-7862-4b47-91d2-105d4ae64512"""
+ 065d9fe0-9e41-4add-8a55-577dbcfe2149
+-534792bd-d102-4efc-bc11-6af743959704
++7cc9d271-54c8-4685-99bf-70d872da0cc6
+ 9ee101a4-7d1a-45c0-8955-da779398a5ed
+ c2249963-6459-4901-8263-85610a7a2ac9
+"""

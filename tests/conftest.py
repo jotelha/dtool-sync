@@ -64,7 +64,7 @@ def lhs_repository_fixture(lhs_uri_fixture):
             dest = lhs_uri_fixture
             dtoolcore.copy(src, dest)
 
-    return  lhs_uri_fixture
+    return lhs_uri_fixture
 
 
 @pytest.fixture
@@ -78,13 +78,24 @@ def rhs_repository_fixture(rhs_uri_fixture):
             dest = rhs_uri_fixture
             dtoolcore.copy(src, dest)
 
-    return  rhs_uri_fixture
+    return rhs_uri_fixture
 
 
 @pytest.fixture
 def comparable_repositories_fixture(request):
-    lhs_uri = os.path.join(_DATA, "comparable", "lhs")
-    rhs_uri = os.path.join(_DATA, "comparable", "rhs")
+    lhs_src_tree = os.path.join(_DATA, "comparable", "lhs")
+    rhs_src_tree = os.path.join(_DATA, "comparable", "rhs")
+
+    d = tempfile.mkdtemp()
+    lhs_dest_tree = os.path.join(d, 'lhs')
+    rhs_dest_tree = os.path.join(d, 'rhs')
+    lhs_uri = dir_to_uri(shutil.copytree(lhs_src_tree, lhs_dest_tree))
+    rhs_uri = dir_to_uri(shutil.copytree(rhs_src_tree, rhs_dest_tree))
+
+    @request.addfinalizer
+    def teardown():
+        shutil.rmtree(d)
+
     return lhs_uri, rhs_uri
 
 
@@ -92,12 +103,6 @@ def comparable_repositories_fixture(request):
 @pytest.fixture
 def expected_output_diff_q(request):
     with open(os.path.join(EXPECTED_OUTPUT_DIR, 'test_dtool_compare_diff_q.out'), 'r') as f:
-        return f.read()
-
-
-@pytest.fixture
-def expected_output_compare_all(request):
-    with open(os.path.join(EXPECTED_OUTPUT_DIR,'test_dtool_compare_all.out'), 'r') as f:
         return f.read()
 
 

@@ -57,7 +57,7 @@ def test_dtool_compare_all_qu(comparable_repositories_fixture, expected_output_c
     assert result.stdout == expected_output_compare_all_qu
 
 
-def test_dtool_sync_all(comparable_repositories_fixture, expected_output_compare_all_jr):
+def test_dtool_sync_all(comparable_repositories_fixture, expected_output_compare_all_jr, expected_output_post_sync_all_compare_all_jr):
     from dtool_sync.cli import sync_all, compare_all
     lhs_uri, rhs_uri = comparable_repositories_fixture
 
@@ -72,18 +72,13 @@ def test_dtool_sync_all(comparable_repositories_fixture, expected_output_compare
 
     # next, we sync
     result = runner.invoke(sync_all, [lhs_uri, rhs_uri])
-    print(result.stdout)
     assert result.exit_code == 0
 
     # eventually, content must be equal
-    result = runner.invoke(compare_all, ['-v', '-j', '-r', lhs_uri, rhs_uri])
+    result = runner.invoke(compare_all, ['-j', '-r', lhs_uri, rhs_uri])
     assert result.exit_code == 0
     out = json.loads(result.stdout)
-    print(json.dumps(out, indent=4))
-    # expected = json.loads(expected_output_compare_all_jr)
-    # assert compare_nested(out, expected)
-
-    # assert result.stdout == expected_output_compare_all_qu
-
+    expected = json.loads(expected_output_post_sync_all_compare_all_jr)
+    assert compare_nested(out, expected)
 
 

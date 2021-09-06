@@ -1,5 +1,6 @@
 """Test fixtures."""
 
+import json
 import os
 import shutil
 import sys
@@ -13,6 +14,7 @@ from dtoolcore.utils import (
     windows_to_unix_path,
 )
 
+from . import comparison_marker_from_obj
 
 # Pytest does not add the working directory to the path so we do it here.
 _HERE = os.path.dirname(os.path.abspath(__file__))
@@ -128,4 +130,20 @@ def expected_output_compare_all_jr(request):
 def expected_output_compare_all_qu(request):
     with open(os.path.join(EXPECTED_OUTPUT_DIR,'test_dtool_compare_all_qu.out'), 'r') as f:
         return f.read()
+
+
+@pytest.fixture
+def expected_output_post_sync_all_compare_all_jr(request):
+    with open(os.path.join(EXPECTED_OUTPUT_DIR,'test_dtool_post_sync_all_comparison.out'), 'r') as f:
+        return f.read()
+
+
+# @pytest.fixture
+# def comparison_marker_post_sync_all(request):
+#     with open(os.path.join(EXPECTED_OUTPUT_DIR,'test_dtool_post_sync_all_comparison.out'), 'r') as f:
+#         sample_data = json.load(f)
+#     marker = comparison_marker_from_obj(sample_data)
+#     return marker
+
+
 

@@ -1,0 +1,17 @@
+[
+    [
+        {
+            "name": "changed",
+            "uuid": "af16c00d-f60d-41ce-83c6-2a7d9c5e1b0d",
+            "creator_username": "jotelha",
+            "uri": "file://jotelha-fujitsu-ubuntu-20/home/jotelha/git/dtool/dtool-sync/tests/data/comparable/lhs/changed",
+            "frozen_at": "2021-09-05"
+        },
+        {
+            "name": "*changed",
+            "uuid": "af16c00d-f60d-41ce-83c6-2a7d9c5e1b0d",
+            "creator_username": "jotelha",
+            "uri": "file://jotelha-fujitsu-ubuntu-20/home/jotelha/git/dtool/dtool-sync/tests/data/comparable/rhs/changed"
+        }
+    ]
+]

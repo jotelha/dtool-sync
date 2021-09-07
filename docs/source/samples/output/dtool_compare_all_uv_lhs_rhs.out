@@ -1,0 +1,18 @@
+Datasets equal on source and target:
+065d9fe0-9e41-4add-8a55-577dbcfe2149
+  file://jotelha-fujitsu-ubuntu-20/home/jotelha/git/dtool/dtool-sync/tests/data/comparable/lhs/lion
+  jotelha  2021-09-05  lion
+9ee101a4-7d1a-45c0-8955-da779398a5ed
+  file://jotelha-fujitsu-ubuntu-20/home/jotelha/git/dtool/dtool-sync/tests/data/comparable/lhs/she
+  jotelha  2021-09-05  she
+c2249963-6459-4901-8263-85610a7a2ac9
+  file://jotelha-fujitsu-ubuntu-20/home/jotelha/git/dtool/dtool-sync/tests/data/comparable/lhs/cat
+  jotelha  2021-09-05  cat
+Datasets changed from source to target:
+af16c00d-f60d-41ce-83c6-2a7d9c5e1b0d
+  file://jotelha-fujitsu-ubuntu-20/home/jotelha/git/dtool/dtool-sync/tests/data/comparable/lhs/changed
+  jotelha  2021-09-05  changed
+Datasets missing on target:
+534792bd-d102-4efc-bc11-6af743959704
+  file://jotelha-fujitsu-ubuntu-20/home/jotelha/git/dtool/dtool-sync/tests/data/comparable/lhs/people
+  jotelha  2021-09-05  people

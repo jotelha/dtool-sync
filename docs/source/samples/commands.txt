@@ -1,0 +1,12 @@
+dtool compare all -jq lhs rhs
+dtool compare all -jv lhs rhs
+dtool compare all -rv lhs rhs
+dtool compare all -u lhs rhs
+dtool compare all -uv lhs rhs
+dtool compare all -v lhs rhs
+dtool compare equal -qu lhs rhs
+dtool compare changed -j lhs rhs
+dtool compare changed -q lhs rhs
+dtool compare changed -jv lhs rhs
+dtool compare missing -jq lhs rhs
+dtool sync all lhs rhs

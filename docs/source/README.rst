@@ -19,82 +19,88 @@ Usage
 
 Compare datasets at two different base URIs:
 
-.. code-block::
+.. ansi-block::
 
-    dtool compare all -v lhs rhs
-
-.. literalinclude:: samples/output/dtool_compare_all_v_lhs_rhs.out
-   :language: console
+    $ dtool compare all -v lhs rhs
+    {% filter indent(4) %}{% include_raw "output/dtool_compare_all_v_lhs_rhs.out" %}{% endfilter %}
 
 Datasets identified as equal by comparing their metadata appear first,
 followed by datasets that are present at both URIs, but have changed.
-A common case for differing datasets is an interrupted transfer. 
+A common case for differing datasets is an interrupted transfer.
 In such a case, the source dataset is has been frozen before, but its
 partial copy at the destination is still marked as a proto dataset.
 Eventually, datasets present at the left hand side URI, but missing
-at the right hand side URI are shown.
+at the right hand side URI are shown. Note that datasets present at
+rhs but missing at lhs are not shown. To identify those, invert the
+comparison's direction.
 
-.. literalinclude:: samples/output/dtool_compare_all_uv_lhs_rhs.out
-.. literalinclude:: samples/output/dtool_compare_all_j_lhs_rhs.out
-.. literalinclude:: samples/output/dtool_compare_changed_j_lhs_rhs.out
-.. literalinclude:: samples/output/dtool_compare_changed_jv_lhs_rhs.out
-.. literalinclude:: samples/output/dtool_compare_all_u_lhs_rhs.out
-.. literalinclude:: samples/output/dtool_compare_changed_q_lhs_rhs.out
-.. literalinclude:: samples/output/dtool_compare_missing_jq_lhs_rhs.out
-.. literalinclude:: samples/output/dtool_compare_all_jq_lhs_rhs.out
-.. literalinclude:: samples/output/dtool_compare_all_lhs_rhs.out
-.. literalinclude:: samples/output/dtool_compare_all_jv_lhs_rhs.out
-.. literalinclude:: samples/output/dtool_compare_equal_qu_lhs_rhs.out
-.. literalinclude:: samples/output/dtool_compare_all_rv_lhs_rhs.out
+.. ansi-block::
 
-.. code-block:: console
+    $ dtool sync all lhs rhs
+    {% filter indent(4) %}{% include_raw "output/dtool_sync_all_lhs_rhs.out" %}{% endfilter %}
 
-    $ dtool sync diff -q test/lhs /tmp/test/rhs
-    --- /tmp/test/lhs
-    +++ /tmp/test/rhs
-    @@ -1,4 +1,4 @@
-     0b5f7c56-5f7e-43de-9b16-bd6f7ac7da12
-    +33a30c8d-60c2-44ac-8ade-abe99a7e2f92
-     5cb6d8bb-255b-4ca5-a445-c1f8121c5333
-    -9d14c3e3-2c87-4bff-9e17-3c51f5f535a0
-     cc6519a9-7862-4b47-91d2-105d4ae64512
+.. ansi-block::
 
-Compare by name and UUID:
+    $ dtool compare all -uv lhs rhs
+    {% filter indent(4) %}{% include_raw "output/dtool_compare_all_uv_lhs_rhs.out" %}{% endfilter %}
+
+.. ansi-block::
+
+    $ dtool compare all -j lhs rhs
+    {% filter indent(4) %}{% include_raw "output/dtool_compare_all_j_lhs_rhs.out" %}{% endfilter %}
+
+.. ansi-block::
+
+    $ dtool compare changed -j lhs rhs
+    {% filter indent(4) %}{% include_raw "output/dtool_compare_changed_j_lhs_rhs.out" %}{% endfilter %}
+
+.. ansi-block::
+
+    $ dtool compare changed -jv lhs rhs
+    {% filter indent(4) %}{% include_raw "output/dtool_compare_changed_jv_lhs_rhs.out" %}{% endfilter %}
+
+.. ansi-block::
+
+    $ dtool compare all -u lhs rhs
+    {% filter indent(4) %}{% include_raw "output/dtool_compare_all_u_lhs_rhs.out" %}{% endfilter %}
+
+.. ansi-block::
+
+    $ dtool compare changed -q lhs rhs
+    {% filter indent(4) %}{% include_raw "output/dtool_compare_changed_q_lhs_rhs.out" %}{% endfilter %}
+
+.. ansi-block::
+
+    $ dtool compare missing -jq lhs rhs
+    {% filter indent(4) %}{% include_raw "output/dtool_compare_missing_jq_lhs_rhs.out" %}{% endfilter %}
+
+.. ansi-block::
+
+    $ dtool compare all -jq lhs rhs
+    {% filter indent(4) %}{% include_raw "output/dtool_compare_all_jq_lhs_rhs.out" %}{% endfilter %}
+
+.. ansi-block::
+
+    $ dtool compare all lhs rhs
+    {% filter indent(4) %}{% include_raw "output/dtool_compare_all_lhs_rhs.out" %}{% endfilter %}
+
+.. ansi-block::
+
+    $ dtool compare all -jv lhs rhs
+    {% filter indent(4) %}{% include_raw "output/dtool_compare_all_jv_lhs_rhs.out" %}{% endfilter %}
 
 
+.. ansi-block::
 
-```console
-$ dtool sync diff /tmp/test/lhs /tmp/test/rhs
---- /tmp/test/lhs
-+++ /tmp/test/rhs
-@@ -1,8 +1,8 @@
- she
-   0b5f7c56-5f7e-43de-9b16-bd6f7ac7da12
-+he
-+  33a30c8d-60c2-44ac-8ade-abe99a7e2f92
- lion
-   5cb6d8bb-255b-4ca5-a445-c1f8121c5333
--people
--  9d14c3e3-2c87-4bff-9e17-3c51f5f535a0
- cat
-   cc6519a9-7862-4b47-91d2-105d4ae64512
-```
+    $ dtool compare equal -qu lhs rhs
+    {% filter indent(4) %}{% include_raw "output/dtool_compare_equal_qu_lhs_rhs.out" %}{% endfilter %}
 
-Compare by UUIDs formatted as JSON list:
 
-```console
-dtool sync diff -qj /tmp/test/lhs /tmp/test/rhs
---- /tmp/test/lhs
-+++ /tmp/test/rhs
-@@ -1,6 +1,6 @@
- [
-     "0b5f7c56-5f7e-43de-9b16-bd6f7ac7da12",
-+    "33a30c8d-60c2-44ac-8ade-abe99a7e2f92",
-     "5cb6d8bb-255b-4ca5-a445-c1f8121c5333",
--    "9d14c3e3-2c87-4bff-9e17-3c51f5f535a0",
-     "cc6519a9-7862-4b47-91d2-105d4ae64512"
- ]
-```
+.. ansi-block::
+
+    $ dtool compare all -rv lhs rhs
+    {% filter indent(4) %}{% include_raw "output/dtool_compare_all_rv_lhs_rhs.out" %}{% endfilter %}
+
 
 Installation
 ------------

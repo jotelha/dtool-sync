@@ -14,8 +14,9 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os
-# import sys
+import sys
 # sys.path.insert(0, os.path.abspath('.'))
+sys.path.append(os.path.abspath("./_ext"))
 
 
 # -- General configuration ------------------------------------------------
@@ -30,10 +31,13 @@ import os
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
-    'sphinx.ext.viewcode']
+    'sphinx.ext.viewcode',
+    'rst_jinja2',
+    'sphinxcontrib.ansi',
+]
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ['_templates', 'samples']
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
@@ -77,6 +81,13 @@ pygments_style = 'sphinx'
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
 
+# context for rst_jinja2 extension
+jinja_context = {
+  'testkey': 'testvalue'
+}
+
+# sphinxcontrib.ansi stylesheet
+html_ansi_stylesheet = 'black-on-white.css'
 
 # -- Options for HTML output ----------------------------------------------
 

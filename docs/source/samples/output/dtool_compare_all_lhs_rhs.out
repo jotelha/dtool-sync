@@ -1,13 +1,14 @@
-Datasets equal on source and target:
-lion
+[1mDatasets equal on source and target:[0m
+[32mlion
   file://path/to/lhs/lion
 she
   file://path/to/lhs/she
 cat
-  file://path/to/lhs/cat
-Datasets changed from source to target:
-changed
-  file://path/to/lhs/changed
-Datasets missing on target:
-people
-  file://path/to/lhs/people
+  file://path/to/lhs/cat[0m
+[1mDatasets changed from source to target:[0m
+[33mchanged
+  file://path/to/lhs/changed[0m
+[1mDatasets missing on target:[0m
+[31mpeople
+  file://path/to/lhs/people[0m
+

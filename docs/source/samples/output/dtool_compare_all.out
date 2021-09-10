@@ -1,0 +1,5 @@
+Usage: dtool compare all [OPTIONS] SOURCE_BASE_URI TARGET_BASE_URI
+Try 'dtool compare all -h' for help.
+
+Error: Missing argument 'SOURCE_BASE_URI'.
+

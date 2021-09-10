@@ -1,3 +1,4 @@
+dtool compare all lhs rhs
 dtool compare all -jq lhs rhs
 dtool compare all -jv lhs rhs
 dtool compare all -rv lhs rhs

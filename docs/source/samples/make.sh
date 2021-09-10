@@ -16,5 +16,5 @@ for index in ${!commands_arr[*]}; do
 done
 exit
 
-cd "${DOCS_SOURCE_PATH}"
-find samples/output -name '*.out' | sed -E 's/^/.. literalinclude:: /g'
+# cd "${DOCS_SOURCE_PATH}"
+# find samples/output -name '*.out' | sed -E 's/^/.. literalinclude:: /g'

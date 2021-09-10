@@ -1,13 +1,13 @@
 Datasets equal on source and target:
 lion
-  file://jotelha-fujitsu-ubuntu-20/home/jotelha/git/dtool/dtool-sync/tests/data/comparable/lhs/lion
+  file://path/to/lhs/lion
 she
-  file://jotelha-fujitsu-ubuntu-20/home/jotelha/git/dtool/dtool-sync/tests/data/comparable/lhs/she
+  file://path/to/lhs/she
 cat
-  file://jotelha-fujitsu-ubuntu-20/home/jotelha/git/dtool/dtool-sync/tests/data/comparable/lhs/cat
+  file://path/to/lhs/cat
 Datasets changed from source to target:
 changed
-  file://jotelha-fujitsu-ubuntu-20/home/jotelha/git/dtool/dtool-sync/tests/data/comparable/lhs/changed
+  file://path/to/lhs/changed
 Datasets missing on target:
 people
-  file://jotelha-fujitsu-ubuntu-20/home/jotelha/git/dtool/dtool-sync/tests/data/comparable/lhs/people
+  file://path/to/lhs/people

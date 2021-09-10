@@ -1,20 +1,18 @@
-Script started on 2021-09-07 18:45:46+02:00 [TERM="xterm-256color" TTY="/dev/pts/4" COLUMNS="203" LINES="32"]
 [
     [
         {
             "name": "changed",
             "uuid": "af16c00d-f60d-41ce-83c6-2a7d9c5e1b0d",
             "creator_username": "jotelha",
-            "uri": "file://jotelha-fujitsu-ubuntu-20/home/jotelha/git/dtool/dtool-sync/tests/data/comparable/lhs/changed",
+            "uri": "file://path/to/lhs/changed",
             "frozen_at": "2021-09-05"
         },
         {
             "name": "*changed",
             "uuid": "af16c00d-f60d-41ce-83c6-2a7d9c5e1b0d",
             "creator_username": "jotelha",
-            "uri": "file://jotelha-fujitsu-ubuntu-20/home/jotelha/git/dtool/dtool-sync/tests/data/comparable/rhs/changed"
+            "uri": "file://path/to/rhs/changed"
         }
     ]
 ]
 
-Script done on 2021-09-07 18:45:47+02:00 [COMMAND_EXIT_CODE="0"]

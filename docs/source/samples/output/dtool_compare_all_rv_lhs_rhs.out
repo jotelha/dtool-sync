@@ -1,21 +1,19 @@
-Script started on 2021-09-07 18:45:42+02:00 [TERM="xterm-256color" TTY="/dev/pts/4" COLUMNS="203" LINES="32"]
 [1mDatasets equal on source and target:[0m
 [32mlion
-  file://jotelha-fujitsu-ubuntu-20/home/jotelha/git/dtool/dtool-sync/tests/data/comparable/lhs/lion
+  file://path/to/lhs/lion
   jotelha  1630851896.375779  065d9fe0-9e41-4add-8a55-577dbcfe2149
 she
-  file://jotelha-fujitsu-ubuntu-20/home/jotelha/git/dtool/dtool-sync/tests/data/comparable/lhs/she
+  file://path/to/lhs/she
   jotelha  1630851892.800604  9ee101a4-7d1a-45c0-8955-da779398a5ed
 cat
-  file://jotelha-fujitsu-ubuntu-20/home/jotelha/git/dtool/dtool-sync/tests/data/comparable/lhs/cat
+  file://path/to/lhs/cat
   jotelha  1630851894.593098  c2249963-6459-4901-8263-85610a7a2ac9[0m
 [1mDatasets changed from source to target:[0m
 [33mchanged
-  file://jotelha-fujitsu-ubuntu-20/home/jotelha/git/dtool/dtool-sync/tests/data/comparable/lhs/changed
+  file://path/to/lhs/changed
   jotelha  1630862808.395145  af16c00d-f60d-41ce-83c6-2a7d9c5e1b0d[0m
 [1mDatasets missing on target:[0m
 [31mpeople
-  file://jotelha-fujitsu-ubuntu-20/home/jotelha/git/dtool/dtool-sync/tests/data/comparable/lhs/people
+  file://path/to/lhs/people
   jotelha  1630851899.345241  534792bd-d102-4efc-bc11-6af743959704[0m
 
-Script done on 2021-09-07 18:45:43+02:00 [COMMAND_EXIT_CODE="0"]

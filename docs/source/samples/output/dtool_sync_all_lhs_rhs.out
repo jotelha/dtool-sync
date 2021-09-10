@@ -1,22 +1,20 @@
-Script started on 2021-09-07 18:45:48+02:00 [TERM="xterm-256color" TTY="/dev/pts/4" COLUMNS="203" LINES="32"]
 [1mDatasets equal on source and target:[0m
 [32mlion
-  file://jotelha-fujitsu-ubuntu-20/home/jotelha/git/dtool/dtool-sync/tests/data/comparable/lhs/lion
+  file://path/to/lhs/lion
 she
-  file://jotelha-fujitsu-ubuntu-20/home/jotelha/git/dtool/dtool-sync/tests/data/comparable/lhs/she
+  file://path/to/lhs/she
 cat
-  file://jotelha-fujitsu-ubuntu-20/home/jotelha/git/dtool/dtool-sync/tests/data/comparable/lhs/cat[0m
+  file://path/to/lhs/cat[0m
 [1mDatasets changed from source to target:[0m
 [33mchanged
-  file://jotelha-fujitsu-ubuntu-20/home/jotelha/git/dtool/dtool-sync/tests/data/comparable/lhs/changed[0m
+  file://path/to/lhs/changed[0m
 [1mDatasets missing on target:[0m
 [31mpeople
-  file://jotelha-fujitsu-ubuntu-20/home/jotelha/git/dtool/dtool-sync/tests/data/comparable/lhs/people[0m
+  file://path/to/lhs/people[0m
 Resume copying of changed datasets, presuming their transfer had been interrupted in an earlier attempt.[0m
 Dataset copied to:
-file://jotelha-fujitsu-ubuntu-20/home/jotelha/git/dtool/dtool-sync/tests/data/comparable/rhs/changed[0m
+file://path/to/rhs/changed[0m
 Copy missing datasets.[0m
 Dataset copied to:
-file://jotelha-fujitsu-ubuntu-20/home/jotelha/git/dtool/dtool-sync/tests/data/comparable/rhs/people[0m
+file://path/to/rhs/people[0m
 
-Script done on 2021-09-07 18:45:48+02:00 [COMMAND_EXIT_CODE="0"]

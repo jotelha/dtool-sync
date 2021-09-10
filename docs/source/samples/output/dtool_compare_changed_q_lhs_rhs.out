@@ -1,4 +1,2 @@
-Script started on 2021-09-07 18:45:46+02:00 [TERM="xterm-256color" TTY="/dev/pts/4" COLUMNS="203" LINES="32"]
-file://jotelha-fujitsu-ubuntu-20/home/jotelha/git/dtool/dtool-sync/tests/data/comparable/lhs/changed
+file://path/to/lhs/changed
 
-Script done on 2021-09-07 18:45:46+02:00 [COMMAND_EXIT_CODE="0"]

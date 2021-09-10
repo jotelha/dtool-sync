@@ -1,0 +1,5 @@
+Outputs to show in doumentation.
+
+commands.txt holds list of all commands to run.
+
+Generate outputs with make.sh, reformat with reformat.sh.

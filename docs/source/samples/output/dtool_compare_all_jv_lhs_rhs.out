@@ -1,4 +1,3 @@
-Script started on 2021-09-07 18:45:41+02:00 [TERM="xterm-256color" TTY="/dev/pts/4" COLUMNS="203" LINES="32"]
 {
     "equal": [
         [
@@ -6,14 +5,14 @@ Script started on 2021-09-07 18:45:41+02:00 [TERM="xterm-256color" TTY="/dev/pts
                 "name": "lion",
                 "uuid": "065d9fe0-9e41-4add-8a55-577dbcfe2149",
                 "creator_username": "jotelha",
-                "uri": "file://jotelha-fujitsu-ubuntu-20/home/jotelha/git/dtool/dtool-sync/tests/data/comparable/lhs/lion",
+                "uri": "file://path/to/lhs/lion",
                 "frozen_at": "2021-09-05"
             },
             {
                 "name": "lion",
                 "uuid": "065d9fe0-9e41-4add-8a55-577dbcfe2149",
                 "creator_username": "jotelha",
-                "uri": "file://jotelha-fujitsu-ubuntu-20/home/jotelha/git/dtool/dtool-sync/tests/data/comparable/rhs/lion",
+                "uri": "file://path/to/rhs/lion",
                 "frozen_at": "2021-09-05"
             }
         ],
@@ -22,14 +21,14 @@ Script started on 2021-09-07 18:45:41+02:00 [TERM="xterm-256color" TTY="/dev/pts
                 "name": "she",
                 "uuid": "9ee101a4-7d1a-45c0-8955-da779398a5ed",
                 "creator_username": "jotelha",
-                "uri": "file://jotelha-fujitsu-ubuntu-20/home/jotelha/git/dtool/dtool-sync/tests/data/comparable/lhs/she",
+                "uri": "file://path/to/lhs/she",
                 "frozen_at": "2021-09-05"
             },
             {
                 "name": "she",
                 "uuid": "9ee101a4-7d1a-45c0-8955-da779398a5ed",
                 "creator_username": "jotelha",
-                "uri": "file://jotelha-fujitsu-ubuntu-20/home/jotelha/git/dtool/dtool-sync/tests/data/comparable/rhs/she",
+                "uri": "file://path/to/rhs/she",
                 "frozen_at": "2021-09-05"
             }
         ],
@@ -38,14 +37,14 @@ Script started on 2021-09-07 18:45:41+02:00 [TERM="xterm-256color" TTY="/dev/pts
                 "name": "cat",
                 "uuid": "c2249963-6459-4901-8263-85610a7a2ac9",
                 "creator_username": "jotelha",
-                "uri": "file://jotelha-fujitsu-ubuntu-20/home/jotelha/git/dtool/dtool-sync/tests/data/comparable/lhs/cat",
+                "uri": "file://path/to/lhs/cat",
                 "frozen_at": "2021-09-05"
             },
             {
                 "name": "cat",
                 "uuid": "c2249963-6459-4901-8263-85610a7a2ac9",
                 "creator_username": "jotelha",
-                "uri": "file://jotelha-fujitsu-ubuntu-20/home/jotelha/git/dtool/dtool-sync/tests/data/comparable/rhs/cat",
+                "uri": "file://path/to/rhs/cat",
                 "frozen_at": "2021-09-05"
             }
         ]
@@ -56,14 +55,14 @@ Script started on 2021-09-07 18:45:41+02:00 [TERM="xterm-256color" TTY="/dev/pts
                 "name": "changed",
                 "uuid": "af16c00d-f60d-41ce-83c6-2a7d9c5e1b0d",
                 "creator_username": "jotelha",
-                "uri": "file://jotelha-fujitsu-ubuntu-20/home/jotelha/git/dtool/dtool-sync/tests/data/comparable/lhs/changed",
+                "uri": "file://path/to/lhs/changed",
                 "frozen_at": "2021-09-05"
             },
             {
                 "name": "*changed",
                 "uuid": "af16c00d-f60d-41ce-83c6-2a7d9c5e1b0d",
                 "creator_username": "jotelha",
-                "uri": "file://jotelha-fujitsu-ubuntu-20/home/jotelha/git/dtool/dtool-sync/tests/data/comparable/rhs/changed"
+                "uri": "file://path/to/rhs/changed"
             }
         ]
     ],
@@ -72,10 +71,9 @@ Script started on 2021-09-07 18:45:41+02:00 [TERM="xterm-256color" TTY="/dev/pts
             "name": "people",
             "uuid": "534792bd-d102-4efc-bc11-6af743959704",
             "creator_username": "jotelha",
-            "uri": "file://jotelha-fujitsu-ubuntu-20/home/jotelha/git/dtool/dtool-sync/tests/data/comparable/lhs/people",
+            "uri": "file://path/to/lhs/people",
             "frozen_at": "2021-09-05"
         }
     ]
 }
 
-Script done on 2021-09-07 18:45:42+02:00 [COMMAND_EXIT_CODE="0"]

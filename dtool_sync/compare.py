@@ -1,7 +1,6 @@
 import logging
 
 import json
-import dtool_lookup_api as dl
 
 import dtoolcore
 from dtool_cli.cli import CONFIG_PATH
@@ -94,13 +93,6 @@ def _direct_list(base_uri, config_path=CONFIG_PATH):
         info.append(admin_metadata)
 
     by_name = sorted(info, key=lambda d: d['name'])
-    return by_name
-
-
-def _lookup_list(query={}):
-    """List all datasets registered at lookup servr, filtered by query."""
-    res = dl.query(query)
-    by_name = sorted(res, key=lambda d: d['name'])
     return by_name
 
 

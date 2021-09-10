@@ -2,9 +2,9 @@
 # inspired by
 #   * https://github.com/dropseed/combine/blob/47e7c75ca74fc056c7169206732b7cc1e3256773/combine/jinja/include_raw.py,
 #   * https://www.ericholscher.com/blog/2016/jul/25/integrating-jinja-rst-sphinx/
+import sphinx
 from jinja2 import nodes
 from jinja2.ext import Extension
-from jinja2 import Markup
 
 
 class IncludeRawExtension(Extension):
@@ -25,6 +25,9 @@ def rst_jinja2(app, docname, source):
     Render our pages as a jinja template.
     """
     src = source[0]
+    if not hasattr(app.builder, "templates"):
+        app.builder.create_template_bridge()
+        app.builder.templates.init(app.builder)
     app.builder.templates.environment.add_extension(IncludeRawExtension)
     rendered = app.builder.templates.render_string(
         src, app.config.jinja_context

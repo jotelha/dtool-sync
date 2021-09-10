@@ -34,6 +34,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'rst_jinja2',
     'sphinxcontrib.ansi',
+    'sphinxcontrib.restbuilder'
 ]
 
 # Add any paths that contain templates here, relative to this directory.

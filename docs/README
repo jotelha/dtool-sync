@@ -1,0 +1,5 @@
+Run
+
+    make README
+
+to generate monolithic README.rst and place within root of repository (./..) from source.

@@ -181,7 +181,7 @@ def sync_all(source_base_uri, target_base_uri,
     for src_ds, dst_ds in changed:
         try:
             copy_dataset(resume=True, quiet=quiet, dataset_uri=src_ds["uri"], dest_base_uri=target_base_uri)
-        except click.UsageError as e:
+        except:
             if not ignore_errors:
                 raise
             else:
@@ -193,7 +193,7 @@ def sync_all(source_base_uri, target_base_uri,
     for src_ds in missing:
         try:
             copy_dataset(resume=False, quiet=quiet, dataset_uri=src_ds["uri"], dest_base_uri=target_base_uri)
-        except click.UsageError as e:
+        except:
             if not ignore_errors:
                 raise
             else:

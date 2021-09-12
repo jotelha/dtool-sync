@@ -2,11 +2,15 @@
 
 import click
 import difflib
+import logging
 
 from dtool_create.dataset import _copy as copy_dataset
 
 from . import _direct_list, _format_dataset_enumerable
 from .compare import compare_dataset_lists
+
+
+logger = logging.getLogger(__name__)
 
 
 @click.group()
@@ -181,11 +185,12 @@ def sync_all(source_base_uri, target_base_uri,
     for src_ds, dst_ds in changed:
         try:
             copy_dataset(resume=True, quiet=quiet, dataset_uri=src_ds["uri"], dest_base_uri=target_base_uri)
-        except:
+        except Exception as exc:
             if not ignore_errors:
                 raise
             else:
-                pass
+                logger.exception(exc)
+
 
     if not quiet:
         click.secho("Copy missing datasets.")
@@ -193,8 +198,8 @@ def sync_all(source_base_uri, target_base_uri,
     for src_ds in missing:
         try:
             copy_dataset(resume=False, quiet=quiet, dataset_uri=src_ds["uri"], dest_base_uri=target_base_uri)
-        except:
+        except Exception as exc:
             if not ignore_errors:
                 raise
             else:
-                pass
+                logger.exception(exc)

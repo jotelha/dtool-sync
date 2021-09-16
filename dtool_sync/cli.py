@@ -209,16 +209,18 @@ def sync_all(source_base_uri, target_base_uri,
         click.secho("Copy missing datasets.")
 
     for src_ds in missing:
-        try:
-            if dry_run:
-                click.secho(f"Dry run, would copy {src_ds['uri']} to {target_base_uri} now.")
-            else:
+        if dry_run:
+            click.secho(f"Dry run, would copy {src_ds['uri']} to {target_base_uri} now.")
+        else:
+            try:
                 copy_dataset(resume=False, quiet=quiet, dataset_uri=src_ds["uri"], dest_base_uri=target_base_uri)
-                if max_cache_size is not None:
-                    _clean_cache(max_cache_size)
+            except OSError as exc:
+                raise # might have run out of storage
+            except Exception as exc:
+                if not ignore_errors:
+                    raise
+                else:
+                    logger.exception(exc)
 
-        except Exception as exc:
-            if not ignore_errors:
-                raise
-            else:
-                logger.exception(exc)
+            if max_cache_size is not None:
+                _clean_cache(max_cache_size)

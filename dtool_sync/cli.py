@@ -4,9 +4,16 @@ import click
 import difflib
 import logging
 
+import humanfriendly
+
 from dtool_create.dataset import _copy as copy_dataset
 
-from . import _direct_list, _format_dataset_enumerable
+from . import (
+    _direct_list,
+    _format_dataset_enumerable,
+    _parse_file_size,
+    _clean_cache,
+)
 from .compare import compare_dataset_lists
 
 
@@ -159,11 +166,18 @@ def compare_missing(source_base_uri, target_base_uri,
 @click.option("-u", "--uuid", is_flag=True, help="Print UUIDs instead of names.")
 @click.option("-v", "--verbose", is_flag=True, default=False, help="Print more.")
 @click.option("--ignore-errors", is_flag=True, help="In case of an error, continue with copying next dataset instead of stopping with an error.")
+@click.option('--max-cache-size', default="none", type=click.UNPROCESSED, callback=_parse_file_size,
+              help="""All synced datasets are cached locally. 
+                      Specify maximum cache size here (i.e. --max-cache-size 5GB) 
+                      to delete older cache entries when limit exceeded. Specify 
+                      0 (zero) to empty cache after each copied dataset. Per
+                      default, never empty cache.""")
 @click.argument("source_base_uri")
 @click.argument("target_base_uri")
 def sync_all(source_base_uri, target_base_uri,
-            dry_run, ignore_errors, quiet, uuid, verbose,
-            marker={'uuid': True, 'name': True, 'frozen_at': True}):  # key 'created_at' apparently introduced in later dtool versions:
+             dry_run, ignore_errors, quiet, uuid, verbose,
+             max_cache_size,
+             marker={'uuid': True, 'name': True, 'frozen_at': True}):  # key 'created_at' apparently introduced in later dtool versions:
     """Sync datasets from source to target base URIs."""
     source_info = _direct_list(source_base_uri, raw=True)
     target_info = _direct_list(target_base_uri, raw=True)
@@ -191,13 +205,18 @@ def sync_all(source_base_uri, target_base_uri,
             else:
                 logger.exception(exc)
 
-
     if not quiet:
         click.secho("Copy missing datasets.")
 
     for src_ds in missing:
         try:
-            copy_dataset(resume=False, quiet=quiet, dataset_uri=src_ds["uri"], dest_base_uri=target_base_uri)
+            if dry_run:
+                click.secho(f"Dry run, would copy {src_ds['uri']} to {target_base_uri} now.")
+            else:
+                copy_dataset(resume=False, quiet=quiet, dataset_uri=src_ds["uri"], dest_base_uri=target_base_uri)
+                if max_cache_size is not None:
+                    _clean_cache(max_cache_size)
+
         except Exception as exc:
             if not ignore_errors:
                 raise

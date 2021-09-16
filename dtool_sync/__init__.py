@@ -13,15 +13,104 @@ except PackageNotFoundError:
 
 
 import json as JSON
+import logging
+import os
+import shutil
 
 import click
 import dtoolcore
+import humanfriendly
 
-from dtool_info.utils import sizeof_fmt, date_fmt
+
+from dtoolcore.utils import (
+    get_config_value,
+    DEFAULT_CACHE_PATH,
+)
 
 from dtool_cli.cli import (
     CONFIG_PATH,
 )
+
+from dtool_info.utils import sizeof_fmt, date_fmt
+
+
+logger = logging.getLogger(__name__)
+
+
+# helper functions
+
+
+def _get_dir_size(directory):
+    """Get directory size in bytes."""
+    total_size = 0
+    for dirpath, dirnames, filenames in os.walk(directory):
+        for file in filenames:
+            filepath = os.path.join(dirpath, file)
+            if not os.path.islink(filepath):
+                total_size += os.path.getsize(filepath)
+    return total_size
+
+
+def _get_cache_size(config_path=None):
+    cache_abspath = get_config_value(
+        "DTOOL_CACHE_DIRECTORY",
+        config_path=config_path,
+        default=DEFAULT_CACHE_PATH
+    )
+    return _get_dir_size(cache_abspath)
+
+
+def _clean_cache(upper_limit=0, config_path=None):
+    """Delete cache entries until total cache size is below or equal upper limit in bytes.
+
+    Returns size of cache after deletion."""
+    cache_abspath = get_config_value(
+        "DTOOL_CACHE_DIRECTORY",
+        config_path=config_path,
+        default=DEFAULT_CACHE_PATH
+    )
+    unsorted_directory_contents = os.scandir(cache_abspath)
+
+    # sor ascending by mtime, delete older entries first
+    mtime_sorted_directory_contents = sorted(unsorted_directory_contents,
+                                             key=lambda d: d.stat().st_mtime)
+
+    logger.debug(f"Entries in '{cache_abspath}': {JSON.dumps(mtime_sorted_directory_contents)}")
+
+    for entry in mtime_sorted_directory_contents:
+        cache_size = _get_cache_size()
+        if cache_size <= upper_limit:
+            logger.debug(f"Cache size {humanfriendly.format_size(cache_size)}" 
+                         f"fulfils upper limit {humanfriendly.format_size(cache_size)}.")
+            break
+        logger.debug(f"Cache size {humanfriendly.format_size(cache_size)}"
+                     f"exceeds upper limit {humanfriendly.format_size(cache_size)}.")
+        if entry.is_dir:
+            logger.debug(f"Remove directory entry {entry.name}")
+            shutil.rmtree(os.path.join(cache_abspath, entry.name))
+        # chache entries are only directories, never files
+        # elif entry.if_file:
+        #    logger.debug(f"Remove file entry {entry.name}")
+        #    os.remove(os.path.join(cache_abspath, entry.name))
+        else:
+            raise NotADirectoryError(f"Cache entry {entry.name} not a directory.")
+
+    return _get_cache_size()
+
+
+def _parse_file_size(ctx, param, value):
+    """Parse human-readable file size into bytes.
+
+    Returns None or integer."""
+    if value.lower() == "none":
+        return None
+
+    try:
+        return humanfriendly.parse_size(value)  # TODO: remove dependency on humanfriendly
+    except Exception as exc:
+        logger.exception(exc)
+        raise click.BadParameter(
+            "Format of MAX_CACHE_SIZE must be integer (i.e 1000000000), properly suffixed (i.e. 1GB), or 'none'")
 
 
 def _direct_list(base_uri, config_path=CONFIG_PATH, raw=True):

@@ -27,6 +27,7 @@ setup(
         "click",
         "dtoolcore",
         "dtool-cli",
+        "humanfirendly",
     ],
     entry_points={
         'dtool.cli': ['sync=dtool_sync.cli:sync', 'compare=dtool_sync.cli:compare'],

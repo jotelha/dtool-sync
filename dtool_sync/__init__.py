@@ -74,13 +74,14 @@ def _clean_cache(upper_limit=0, config_path=None):
     # sor ascending by mtime, delete older entries first
     mtime_sorted_directory_contents = sorted(unsorted_directory_contents,
                                              key=lambda d: d.stat().st_mtime)
+    directory_content_names = [d.name for d in mtime_sorted_directory_contents]
 
-    logger.debug(f"Entries in '{cache_abspath}': {JSON.dumps(mtime_sorted_directory_contents)}")
+    logger.debug(f"Entries in '{cache_abspath}': {JSON.dumps(directory_content_names)}")
 
     for entry in mtime_sorted_directory_contents:
         cache_size = _get_cache_size()
         if cache_size <= upper_limit:
-            logger.debug(f"Cache size {humanfriendly.format_size(cache_size)}" 
+            logger.debug(f"Cache size {humanfriendly.format_size(cache_size)} "
                          f"fulfils upper limit {humanfriendly.format_size(cache_size)}.")
             break
         logger.debug(f"Cache size {humanfriendly.format_size(cache_size)}"

@@ -19,6 +19,10 @@ from .compare import compare_dataset_lists
 
 logger = logging.getLogger(__name__)
 
+# TODO: use 'dtool diff' functionality to properly compare frozen datasets
+# TODO: make comparison marker a cli option
+DEFAULT_COMPARISON_MARKER = {'uuid': True, 'name': True, 'frozen_at': True, 'type': True}
+# key 'created_at' only introduced in later dtool versions, thus not included in comparison
 
 @click.group()
 def sync():
@@ -78,8 +82,7 @@ def diff(quiet, verbose, json, lhs_base_uri, rhs_base_uri):
 @click.argument("source_base_uri")
 @click.argument("target_base_uri")
 def compare_all(source_base_uri, target_base_uri,
-            json, quiet, raw, uuid, verbose,
-            marker={'uuid': True, 'name': True, 'frozen_at': True}):  # key 'created_at' apparently introduced in later dtool versions:
+            json, quiet, raw, uuid, verbose, marker=DEFAULT_COMPARISON_MARKER):
     """Print diff report between source and target base URIs."""
     source_info = _direct_list(source_base_uri, raw=raw)
     target_info = _direct_list(target_base_uri, raw=raw)
@@ -104,8 +107,7 @@ def compare_all(source_base_uri, target_base_uri,
 @click.argument("source_base_uri")
 @click.argument("target_base_uri")
 def compare_equal(source_base_uri, target_base_uri,
-            json, quiet, raw, uuid, verbose,
-            marker={'uuid': True, 'name': True, 'frozen_at': True}):  # key 'created_at' apparently introduced in later dtool versions:
+            json, quiet, raw, uuid, verbose, marker=DEFAULT_COMPARISON_MARKER):
     """Report datasets that equal each other at source and at target."""
     source_info = _direct_list(source_base_uri, raw=raw)
     target_info = _direct_list(target_base_uri, raw=raw)
@@ -125,8 +127,7 @@ def compare_equal(source_base_uri, target_base_uri,
 @click.argument("source_base_uri")
 @click.argument("target_base_uri")
 def compare_missing(source_base_uri, target_base_uri,
-            json, quiet, raw, uuid, verbose,
-            marker={'uuid': True, 'name': True, 'frozen_at': True}):  # key 'created_at' apparently introduced in later dtool versions:
+            json, quiet, raw, uuid, verbose, marker=DEFAULT_COMPARISON_MARKER):
     """Report datasets present at source but missing at target."""
     source_info = _direct_list(source_base_uri, raw=raw)
     target_info = _direct_list(target_base_uri, raw=raw)
@@ -146,8 +147,7 @@ def compare_missing(source_base_uri, target_base_uri,
 @click.argument("source_base_uri")
 @click.argument("target_base_uri")
 def compare_missing(source_base_uri, target_base_uri,
-            json, quiet, raw, uuid, verbose,
-            marker={'uuid': True, 'name': True, 'frozen_at': True}):  # key 'created_at' apparently introduced in later dtool versions:
+            json, quiet, raw, uuid, verbose, marker=DEFAULT_COMPARISON_MARKER):
     """Report datasets present at source but missing at target."""
     source_info = _direct_list(source_base_uri, raw=raw)
     target_info = _direct_list(target_base_uri, raw=raw)
@@ -176,8 +176,7 @@ def compare_missing(source_base_uri, target_base_uri,
 @click.argument("target_base_uri")
 def sync_all(source_base_uri, target_base_uri,
              dry_run, ignore_errors, quiet, uuid, verbose,
-             max_cache_size,
-             marker={'uuid': True, 'name': True, 'frozen_at': True}):  # key 'created_at' apparently introduced in later dtool versions:
+             max_cache_size, marker=DEFAULT_COMPARISON_MARKER):
     """Sync datasets from source to target base URIs."""
     source_info = _direct_list(source_base_uri, raw=True)
     target_info = _direct_list(target_base_uri, raw=True)

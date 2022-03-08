@@ -9,11 +9,13 @@ import humanfriendly
 from dtool_create.dataset import _copy as copy_dataset
 
 from . import (
-    _direct_list,
+    _list,
     _format_dataset_enumerable,
     _parse_file_size,
+    _parse_query,
     _clean_cache,
 )
+
 from .compare import compare_dataset_lists
 
 
@@ -40,12 +42,16 @@ def compare():
 @click.option("-q", "--quiet", is_flag=True)
 @click.option("-v", "--verbose", is_flag=True)
 @click.option("-j", "--json", is_flag=True)
+@click.option('--lhs-query', default="none", type=click.UNPROCESSED, callback=_parse_query,
+              help="""If lhs source is a lookup server, filter listed datasets by query.""")
+@click.option('--rhs-query', default="none", type=click.UNPROCESSED, callback=_parse_query,
+              help="""If rhs source is a lookup server, filter listed datasets by query.""")
 @click.argument("lhs_base_uri")
 @click.argument("rhs_base_uri")
-def diff(quiet, verbose, json, lhs_base_uri, rhs_base_uri):
+def diff(quiet, verbose, json, lhs_query, rhs_query, lhs_base_uri, rhs_base_uri):
     """Print textual diff between left hand side base URI and right hand side base URI UUID lists."""
-    lhs_info = _direct_list(lhs_base_uri, raw=False)
-    rhs_info = _direct_list(rhs_base_uri, raw=False)
+    lhs_info = _list(lhs_base_uri, query=lhs_query, raw=False)
+    rhs_info = _list(rhs_base_uri, query=rhs_query, raw=False)
 
     lhs_str = _format_dataset_enumerable(lhs_info, quiet=quiet, verbose=verbose, json=json)
     rhs_str = _format_dataset_enumerable(rhs_info, quiet=quiet, verbose=verbose, json=json)
@@ -79,13 +85,17 @@ def diff(quiet, verbose, json, lhs_base_uri, rhs_base_uri):
 @click.option("-r", "--raw", is_flag=True, help="Compare and print raw metadata instead of reformatted values in the style of 'dtool ls' output.")
 @click.option("-u", "--uuid", is_flag=True, help="Print UUIDs instead of names.")
 @click.option("-v", "--verbose", is_flag=True, default=False, help="Print more metadata.")
+@click.option('--lhs-query', default="none", type=click.UNPROCESSED, callback=_parse_query,
+              help="""If lhs source is a lookup server, filter listed datasets by query.""")
+@click.option('--rhs-query', default="none", type=click.UNPROCESSED, callback=_parse_query,
+              help="""If rhs source is a lookup server, filter listed datasets by query.""")
 @click.argument("source_base_uri")
 @click.argument("target_base_uri")
-def compare_all(source_base_uri, target_base_uri,
+def compare_all(source_base_uri, target_base_uri, lhs_query, rhs_query,
             json, quiet, raw, uuid, verbose, marker=DEFAULT_COMPARISON_MARKER):
     """Print diff report between source and target base URIs."""
-    source_info = _direct_list(source_base_uri, raw=raw)
-    target_info = _direct_list(target_base_uri, raw=raw)
+    source_info = _list(source_base_uri, query=lhs_query, raw=raw)
+    target_info = _list(target_base_uri, query=rhs_query, raw=raw)
 
     equal, changed, missing = compare_dataset_lists(source_info, target_info, marker)
     out_dict = {
@@ -104,13 +114,17 @@ def compare_all(source_base_uri, target_base_uri,
 @click.option("-r", "--raw", is_flag=True, help="Compare and print raw metadata instead of reformatted values in the style of 'dtool ls' output.")
 @click.option("-u", "--uuid", is_flag=True, help="Print UUIDs instead of names.")
 @click.option("-v", "--verbose", is_flag=True, help="Print more metadata.")
+@click.option('--lhs-query', default="none", type=click.UNPROCESSED, callback=_parse_query,
+              help="""If lhs source is a lookup server, filter listed datasets by query.""")
+@click.option('--rhs-query', default="none", type=click.UNPROCESSED, callback=_parse_query,
+              help="""If rhs source is a lookup server, filter listed datasets by query.""")
 @click.argument("source_base_uri")
 @click.argument("target_base_uri")
-def compare_equal(source_base_uri, target_base_uri,
+def compare_equal(source_base_uri, target_base_uri, lhs_query, rhs_query,
             json, quiet, raw, uuid, verbose, marker=DEFAULT_COMPARISON_MARKER):
     """Report datasets that equal each other at source and at target."""
-    source_info = _direct_list(source_base_uri, raw=raw)
-    target_info = _direct_list(target_base_uri, raw=raw)
+    source_info = _list(source_base_uri, query=lhs_query, raw=raw)
+    target_info = _list(target_base_uri, query=rhs_query, raw=raw)
 
     equal, _, _ = compare_dataset_lists(source_info, target_info, marker)
     click.echo(
@@ -124,13 +138,17 @@ def compare_equal(source_base_uri, target_base_uri,
 @click.option("-r", "--raw", is_flag=True, help="Compare and print raw metadata instead of reformatted values in the style of 'dtool ls' output.")
 @click.option("-u", "--uuid", is_flag=True, help="Print UUIDs instead of names.")
 @click.option("-v", "--verbose", is_flag=True, default=False, help="Print more metadata.")
+@click.option('--lhs-query', default="none", type=click.UNPROCESSED, callback=_parse_query,
+              help="""If lhs source is a lookup server, filter listed datasets by query.""")
+@click.option('--rhs-query', default="none", type=click.UNPROCESSED, callback=_parse_query,
+              help="""If rhs source is a lookup server, filter listed datasets by query.""")
 @click.argument("source_base_uri")
 @click.argument("target_base_uri")
-def compare_missing(source_base_uri, target_base_uri,
+def compare_missing(source_base_uri, target_base_uri, lhs_query, rhs_query,
             json, quiet, raw, uuid, verbose, marker=DEFAULT_COMPARISON_MARKER):
     """Report datasets present at source but missing at target."""
-    source_info = _direct_list(source_base_uri, raw=raw)
-    target_info = _direct_list(target_base_uri, raw=raw)
+    source_info = _list(source_base_uri, query=lhs_query, raw=raw)
+    target_info = _list(target_base_uri, query=rhs_query, raw=raw)
 
     _, changed, _ = compare_dataset_lists(source_info, target_info, marker)
     click.echo(
@@ -144,13 +162,17 @@ def compare_missing(source_base_uri, target_base_uri,
 @click.option("-r", "--raw", is_flag=True, help="Compare and print raw metadata instead of reformatted values in the style of 'dtool ls' output.")
 @click.option("-u", "--uuid", is_flag=True, help="Print UUIDs instead of names.")
 @click.option("-v", "--verbose", is_flag=True, default=False, help="Print more metadata.")
+@click.option('--lhs-query', default="none", type=click.UNPROCESSED, callback=_parse_query,
+              help="""If lhs source is a lookup server, filter listed datasets by query.""")
+@click.option('--rhs-query', default="none", type=click.UNPROCESSED, callback=_parse_query,
+              help="""If rhs source is a lookup server, filter listed datasets by query.""")
 @click.argument("source_base_uri")
 @click.argument("target_base_uri")
-def compare_missing(source_base_uri, target_base_uri,
+def compare_missing(source_base_uri, target_base_uri, lhs_query, rhs_query,
             json, quiet, raw, uuid, verbose, marker=DEFAULT_COMPARISON_MARKER):
     """Report datasets present at source but missing at target."""
-    source_info = _direct_list(source_base_uri, raw=raw)
-    target_info = _direct_list(target_base_uri, raw=raw)
+    source_info = _list(source_base_uri, query=lhs_query, raw=raw)
+    target_info = _list(target_base_uri, query=rhs_query, raw=raw)
 
     _, _, missing = compare_dataset_lists(source_info, target_info, marker)
     click.echo(
@@ -165,6 +187,10 @@ def compare_missing(source_base_uri, target_base_uri,
 @click.option("-q", "--quiet", is_flag=True, help="Print less.")
 @click.option("-u", "--uuid", is_flag=True, help="Print UUIDs instead of names.")
 @click.option("-v", "--verbose", is_flag=True, default=False, help="Print more.")
+@click.option('--lhs-query', default="none", type=click.UNPROCESSED, callback=_parse_query,
+              help="""If lhs source is a lookup server, filter listed datasets by query.""")
+@click.option('--rhs-query', default="none", type=click.UNPROCESSED, callback=_parse_query,
+              help="""If rhs source is a lookup server, filter listed datasets by query.""")
 @click.option("--ignore-errors", is_flag=True, help="In case of an error, continue with copying next dataset instead of stopping with an error.")
 @click.option('--max-cache-size', default="none", type=click.UNPROCESSED, callback=_parse_file_size,
               help="""All synced datasets are cached locally. 
@@ -174,12 +200,12 @@ def compare_missing(source_base_uri, target_base_uri,
                       default, never empty cache.""")
 @click.argument("source_base_uri")
 @click.argument("target_base_uri")
-def sync_all(source_base_uri, target_base_uri,
+def sync_all(source_base_uri, target_base_uri, lhs_query, rhs_query,
              dry_run, ignore_errors, quiet, uuid, verbose,
              max_cache_size, marker=DEFAULT_COMPARISON_MARKER):
     """Sync datasets from source to target base URIs."""
-    source_info = _direct_list(source_base_uri, raw=True)
-    target_info = _direct_list(target_base_uri, raw=True)
+    source_info = _list(source_base_uri, query=lhs_query, raw=True)
+    target_info = _list(target_base_uri, query=rhs_query, raw=True)
 
     equal, changed, missing = compare_dataset_lists(source_info, target_info, marker)
     out_dict = {

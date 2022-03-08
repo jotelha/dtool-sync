@@ -1,4 +1,5 @@
 """dtool_sync module."""
+import json
 
 try:
     from importlib.metadata import version, PackageNotFoundError
@@ -114,7 +115,37 @@ def _parse_file_size(ctx, param, value):
             "Format of MAX_CACHE_SIZE must be integer (i.e 1000000000), properly suffixed (i.e. 1GB), or 'none'")
 
 
-def _direct_list(base_uri, config_path=CONFIG_PATH, raw=True):
+def _parse_query(ctx, param, value):
+    """Parse JSON-like mongo query into nested dicts and lists.
+
+        Returns None or dict."""
+    if value.lower() == "none":
+        return None
+
+    try:
+        return json.loads(value)
+    except Exception as exc:
+        logger.exception(exc)
+        raise click.BadParameter(
+            "Format of a query must be valid JSON.")
+
+
+def _lookup_list(*args, query={}, **kwargs):
+    """List all datasets registered at lookup server, filtered by query."""
+    try:
+        import dtool_lookup_api.synchronous as dl
+    except ImportError as exc:
+        logger.error("Please install dtool-lookup-api to compare against lookup server.")
+        raise exc
+    res = dl.query(query)
+
+    # depending on the underlying storage, it is possible to have the same dataset with equivalent UUID
+    # exist multiple times under differing names.
+    by_uuid_and_name = sorted(res, key=lambda d: (d['uuid'], d['name']))
+    return by_uuid_and_name
+
+
+def _direct_list(base_uri, *args, config_path=CONFIG_PATH, raw=True, **kwargs):
     """Directly list all datasets at base_uri via suitable storage broker.
 
     Parameters
@@ -154,8 +185,17 @@ def _direct_list(base_uri, config_path=CONFIG_PATH, raw=True):
     return by_uuid_and_name
 
 
+def _list(base_uri, *args, **kwargs):
+    """Delegates listing dataset either to storage broker or lookup server."""
+    if base_uri.startswith("lookup://"):  # the remainder won't matter for now
+        return _lookup_list(*args, **kwargs)
+    else:
+        return _direct_list(base_uri, *args, **kwargs)
+
+
 def _field_exists(e, field):
     return field in e[0] if isinstance(e, tuple) else field in e
+
 
 def _extract_field(e, field):
     return e[0][field] if isinstance(e, tuple) else e[field]

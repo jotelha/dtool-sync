@@ -182,7 +182,9 @@ def compare_missing(source_base_uri, target_base_uri, lhs_query, rhs_query,
 
 # sync
 
-@sync.command(name="all")
+@sync.command(name="all", help="""One-way comparison and synchronization from 'SOURCE_BASE_URI' to 'TARGET_BASE_URI'.
+                                  If 'TERTIARY_BASE_URI' specified, will compare with 'TARGET_BASE_URI', but actually 
+                                  copy to 'TERTIARY_BASE_URI'.""")
 @click.option("-n", "--dry-run", is_flag=True, help="Only print datasets that will be transferred.")
 @click.option("-q", "--quiet", is_flag=True, help="Print less.")
 @click.option("-u", "--uuid", is_flag=True, help="Print UUIDs instead of names.")
@@ -200,9 +202,10 @@ def compare_missing(source_base_uri, target_base_uri, lhs_query, rhs_query,
                       default, never empty cache.""")
 @click.argument("source_base_uri")
 @click.argument("target_base_uri")
+@click.argument("tertiary_base_uri", required=False)
 def sync_all(source_base_uri, target_base_uri, lhs_query, rhs_query,
              dry_run, ignore_errors, quiet, uuid, verbose,
-             max_cache_size, marker=DEFAULT_COMPARISON_MARKER):
+             max_cache_size, tertiary_base_uri=None, marker=DEFAULT_COMPARISON_MARKER):
     """Sync datasets from source to target base URIs."""
     source_info = _list(source_base_uri, query=lhs_query, raw=True)
     target_info = _list(target_base_uri, query=rhs_query, raw=True)
@@ -221,14 +224,20 @@ def sync_all(source_base_uri, target_base_uri, lhs_query, rhs_query,
 
         click.secho("Resume copying of changed datasets, presuming their transfer had been interrupted in an earlier attempt.")
 
+    if tertiary_base_uri is not None:
+        target_base_uri = tertiary_base_uri
+
     for src_ds, dst_ds in changed:
-        try:
-            copy_dataset(resume=True, quiet=quiet, dataset_uri=src_ds["uri"], dest_base_uri=target_base_uri)
-        except Exception as exc:
-            if not ignore_errors:
-                raise
-            else:
-                logger.exception(exc)
+        if dry_run:
+            click.secho(f"Dry run, would copy {src_ds['uri']} to {target_base_uri} now.")
+        else:
+            try:
+                copy_dataset(resume=True, quiet=quiet, dataset_uri=src_ds["uri"], dest_base_uri=target_base_uri)
+            except Exception as exc:
+                if not ignore_errors:
+                    raise
+                else:
+                    logger.exception(exc)
 
     if not quiet:
         click.secho("Copy missing datasets.")
@@ -242,10 +251,15 @@ def sync_all(source_base_uri, target_base_uri, lhs_query, rhs_query,
             except OSError as exc:
                 raise # might have run out of storage
             except Exception as exc:
-                if not ignore_errors:
-                    raise
-                else:
-                    logger.exception(exc)
+                try:
+                    copy_dataset(resume=True, quiet=quiet, dataset_uri=src_ds["uri"], dest_base_uri=target_base_uri)
+                except OSError as exc:
+                    raise  # might have run out of storage
+                except Exception as exc:
+                    if not ignore_errors:
+                        raise
+                    else:
+                        logger.exception(exc)
 
             if max_cache_size is not None:
                 _clean_cache(max_cache_size)

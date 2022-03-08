@@ -1,6 +1,7 @@
 import logging
 
 import json
+import math
 
 import dtoolcore
 from dtool_cli.cli import CONFIG_PATH
@@ -14,6 +15,18 @@ def _make_marker(d):
         return {k: _make_marker(v) for k, v in d.items()}
     else:
         return True
+
+
+def _equal(source, target):
+    """Treats slightly differing floats as equal."""
+
+    # type-dependent treatment:
+    # the lookup server yields floats with lower accuracy then the direct storage broker,
+    # i.e. comparison will fail at '1646312878.401044' == '1646312878.401'
+    if isinstance(source, float) and isinstance(target, float):
+        return math.isclose(source, target, rel_tol=1e-9, abs_tol=0.0)
+    else:
+        return source == target
 
 
 def _compare(source, target, marker):
@@ -43,8 +56,8 @@ def _compare(source, target, marker):
     else:  # arrived at leaf, comparison desired?
         if marker is not False:  # yes
             logger.debug("Comparing '{}' == '{}' -> {}.".format(
-                source, target, source == target))
-            return source == target
+                source, target, _equal(source, target)))
+            return _equal(source, target)
 
     # comparison either not desired or successfull for all elements
     return True

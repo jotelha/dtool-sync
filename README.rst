@@ -236,6 +236,20 @@ shown as lists of tuples of datasets.
    }
 
 
+To compare against the index of a configured lookup server, use the dummy
+``lookup://`` scheme, i.e.
+
+::
+
+  dtool sync --dry-run -jv file://lhs lookup://rhs
+
+To compare against one base URI, but actually transfer datasets to another,
+just specify three base URIs in the order `source`, `target for comparison`,
+and `target for transfer`, i.e.
+
+::
+
+  dtool sync --dry-run -jv file://source lookup://server s3://target
 
 Installation
 ============

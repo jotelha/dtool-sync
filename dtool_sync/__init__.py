@@ -162,23 +162,8 @@ def _direct_list(base_uri, *args, config_path=CONFIG_PATH, raw=True, **kwargs):
 
     for uri in storage_broker.list_dataset_uris(base_uri, config_path):
         admin_metadata = dtoolcore._admin_metadata_from_uri(uri, config_path)
-
-        if raw:
-            i = admin_metadata
-            i['uri'] = uri
-        else:
-            name = admin_metadata["name"]
-            if admin_metadata["type"] == "protodataset":
-                name = "*" + name
-            i = dict(
-                name=name,
-                uuid=admin_metadata["uuid"],
-                creator_username=admin_metadata["creator_username"],
-                uri=uri,
-                type=admin_metadata["type"])
-            if "frozen_at" in admin_metadata:
-                i["frozen_at"] = date_fmt(admin_metadata["frozen_at"])
-        info.append(i)
+        admin_metadata['uri'] = uri
+        info.append(admin_metadata)
 
     # depending on the underlying storage, it is possible to have the same dataset with equivalent UUID
     # exist multiple times under differing names.
@@ -242,7 +227,7 @@ def _txt_format_dataset_list(dataset_list, quiet=False, verbose=False, ls_output
             if verbose:
                 out_string += "  " + _extract_field(i, "creator_username")
                 if _field_exists(i, "frozen_at"):
-                    out_string += "  " + str(_extract_field(i, "frozen_at"))
+                    out_string += "  " + date_fmt(_extract_field(i, "frozen_at"))
                 out_string += "  " + _extract_field(i, 'uuid') + '\n'
     else:  # ls-like output, but emphasizing uuids, excluding uris
         for i in dataset_list:
@@ -254,7 +239,7 @@ def _txt_format_dataset_list(dataset_list, quiet=False, verbose=False, ls_output
             if verbose:
                 out_string += "  " + _extract_field(i, "creator_username")
                 if _field_exists(i, "frozen_at"):
-                    out_string += "  " + str(_extract_field(i, 'frozen_at'))
+                    out_string += "  " + date_fmt(_extract_field(i, 'frozen_at'))
                 out_string += "  " + _extract_field(i, "name") + '\n'
     return out_string.rstrip()
 

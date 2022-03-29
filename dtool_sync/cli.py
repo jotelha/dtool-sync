@@ -28,9 +28,6 @@ DEFAULT_COMPARISON_MARKER = {'uuid': True, 'name': True, 'frozen_at': True, 'typ
 @click.option("-n", "--dry-run", is_flag=True, help="Only print datasets that will be transferred.")
 @click.option("-j", "--json", is_flag=True, default=False, help="Print metadata of compared datasets as JSON")
 @click.option("-q", "--quiet", is_flag=True, default=False, help="Print less.")
-@click.option("-r", "--raw", is_flag=True, default=False,
-              help="Compare and print raw metadata instead of reformatted values in the style of 'dtool ls' output.")
-@click.option("-u", "--uuid", is_flag=True, help="Print UUIDs instead of names.")
 @click.option("-v", "--verbose", is_flag=True, default=False, help="Print more.")
 @click.option("--changed-only", is_flag=True, default=False,
               help="Sync only datasets present bu differing at both base URIs.")
@@ -52,14 +49,14 @@ DEFAULT_COMPARISON_MARKER = {'uuid': True, 'name': True, 'frozen_at': True, 'typ
 @click.argument("target_base_uri")
 @click.argument("tertiary_base_uri", required=False)
 def sync(source_base_uri, target_base_uri, lhs_query, rhs_query,
-         dry_run, ignore_errors, json, quiet, raw, uuid, verbose,
+         dry_run, ignore_errors, json, quiet, verbose,
          changed_only, missing_only,
          max_cache_size, tertiary_base_uri=None, marker=DEFAULT_COMPARISON_MARKER):
     """One-way comparison and synchronization from 'SOURCE_BASE_URI' to 'TARGET_BASE_URI'.
        If 'TERTIARY_BASE_URI' specified, will compare with 'TARGET_BASE_URI', but actually
        copy to 'TERTIARY_BASE_URI'."""
-    source_info = _list(source_base_uri, query=lhs_query, raw=raw)
-    target_info = _list(target_base_uri, query=rhs_query, raw=raw)
+    source_info = _list(source_base_uri, query=lhs_query)
+    target_info = _list(target_base_uri, query=rhs_query)
 
     equal, changed, missing = compare_dataset_lists(source_info, target_info, marker)
     out_dict = {
@@ -71,7 +68,7 @@ def sync(source_base_uri, target_base_uri, lhs_query, rhs_query,
     if not quiet or json:
         click.echo(
             _format_dataset_enumerable(out_dict, quiet=quiet, verbose=verbose,
-                                       json=json, ls_output=not uuid)
+                                       json=json, ls_output=True)
         )
 
     if tertiary_base_uri is not None:

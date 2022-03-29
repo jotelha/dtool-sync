@@ -231,32 +231,6 @@ shown as lists of tuples of datasets.
        ]
    }
 
-The ``--raw`` or ``-r`` flag compares and displays metadata (in particular
-timestamps) as stored without any conversion reformatting for pretty
-output:
-
-::
-
-   $ dtool sync --dry-run -rv lhs rhs
-   Datasets equal on source and target:
-   lion
-     file://path/to/lhs/lion
-     jotelha  1630851896.375779  065d9fe0-9e41-4add-8a55-577dbcfe2149
-   she
-     file://path/to/lhs/she
-     jotelha  1630851892.800604  9ee101a4-7d1a-45c0-8955-da779398a5ed
-   cat
-     file://path/to/lhs/cat
-     jotelha  1630851894.593098  c2249963-6459-4901-8263-85610a7a2ac9
-   Datasets changed from source to target:
-   changed
-     file://path/to/lhs/changed
-     jotelha  1630862808.395145  af16c00d-f60d-41ce-83c6-2a7d9c5e1b0d
-   Datasets missing on target:
-   people
-     file://path/to/lhs/people
-     jotelha  1630851899.345241  534792bd-d102-4efc-bc11-6af743959704
-
 
 Installation
 ============

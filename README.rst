@@ -77,6 +77,10 @@ Datasets already partially present at ``rhs`` are transferred first,
 then missing datasets. Again, this only syncs one way from ``lhs`` to
 ``rhs``.
 
+``dtool sync`` will raise an error if the transfer fails at a single dataset.
+To ignore a single failure and continue with the transfer, use the
+``--ignore-errors`` flag.
+
 Use ``-verbose`` or *-v* to show more metadata in the output:
 
 ::
@@ -230,6 +234,7 @@ shown as lists of tuples of datasets.
            }
        ]
    }
+
 
 
 Installation

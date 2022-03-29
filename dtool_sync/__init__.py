@@ -162,22 +162,8 @@ def _direct_list(base_uri, *args, config_path=CONFIG_PATH, raw=True, **kwargs):
 
     for uri in storage_broker.list_dataset_uris(base_uri, config_path):
         admin_metadata = dtoolcore._admin_metadata_from_uri(uri, config_path)
-
-        if raw:
-            i = admin_metadata
-            i['uri'] = uri
-        else:
-            name = admin_metadata["name"]
-            if admin_metadata["type"] == "protodataset":
-                name = "*" + name
-            i = dict(
-                name=name,
-                uuid=admin_metadata["uuid"],
-                creator_username=admin_metadata["creator_username"],
-                uri=uri)
-            if "frozen_at" in admin_metadata:
-                i["frozen_at"] = date_fmt(admin_metadata["frozen_at"])
-        info.append(i)
+        admin_metadata['uri'] = uri
+        info.append(admin_metadata)
 
     # depending on the underlying storage, it is possible to have the same dataset with equivalent UUID
     # exist multiple times under differing names.
@@ -241,7 +227,7 @@ def _txt_format_dataset_list(dataset_list, quiet=False, verbose=False, ls_output
             if verbose:
                 out_string += "  " + _extract_field(i, "creator_username")
                 if _field_exists(i, "frozen_at"):
-                    out_string += "  " + str(_extract_field(i, "frozen_at"))
+                    out_string += "  " + date_fmt(_extract_field(i, "frozen_at"))
                 out_string += "  " + _extract_field(i, 'uuid') + '\n'
     else:  # ls-like output, but emphasizing uuids, excluding uris
         for i in dataset_list:
@@ -253,7 +239,7 @@ def _txt_format_dataset_list(dataset_list, quiet=False, verbose=False, ls_output
             if verbose:
                 out_string += "  " + _extract_field(i, "creator_username")
                 if _field_exists(i, "frozen_at"):
-                    out_string += "  " + str(_extract_field(i, 'frozen_at'))
+                    out_string += "  " + date_fmt(_extract_field(i, 'frozen_at'))
                 out_string += "  " + _extract_field(i, "name") + '\n'
     return out_string.rstrip()
 
@@ -292,3 +278,42 @@ def _format_dataset_enumerable(dataset_enumerable, quiet=False, verbose=False, j
             indent=4)
     else:
         return _txt_format_dataset_enumerable(dataset_enumerable, quiet=quiet, verbose=verbose, ls_output=ls_output)
+
+
+class DefaultGroup(click.Group):
+    """Click group with default command, from https://github.com/pallets/click/issues/430"""
+
+    ignore_unknown_options = True
+
+    def __init__(self, *args, **kwargs):
+        default_command = kwargs.pop('default_command', None)
+        super(DefaultGroup, self).__init__(*args, **kwargs)
+        self.default_cmd_name = None
+        if default_command is not None:
+            self.set_default_command(default_command)
+
+    def set_default_command(self, command):
+        if isinstance(command, str):
+            cmd_name = command
+        else:
+            cmd_name = command.name
+            self.add_command(command)
+        self.default_cmd_name = cmd_name
+
+    def parse_args(self, ctx, args):
+        if not args and self.default_cmd_name is not None:
+            args.insert(0, self.default_cmd_name)
+        return super(DefaultGroup, self).parse_args(ctx, args)
+
+    def get_command(self, ctx, cmd_name):
+        if cmd_name not in self.commands and self.default_cmd_name is not None:
+            ctx.args0 = cmd_name
+            cmd_name = self.default_cmd_name
+        return super(DefaultGroup, self).get_command(ctx, cmd_name)
+
+    def resolve_command(self, ctx, args):
+        cmd_name, cmd, args = super(DefaultGroup, self).resolve_command(ctx, args)
+        args0 = getattr(ctx, 'args0', None)
+        if args0 is not None:
+            args.insert(0, args0)
+        return cmd_name, cmd, args
